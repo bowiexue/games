@@ -3,119 +3,138 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>✨ Cozy Pastel Arcade ✨</title>
-    <!-- Fonts and Stylesheet -->
+    <title>👾 Retro Pixel Arcade 👾</title>
     <link href="https://googleapis.com" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<div id="app-container">
+<div id="arcade-cabinet">
     <header>
-        <button class="back-btn" id="backBtn" onclick="showHome()">🌸 Home</button>
-        <h1 id="mainTitle">Cozy Arcade</h1>
+        <button class="pixel-btn back-btn" id="backBtn" onclick="showHome()">◀ HOME</button>
+        <h1 id="mainTitle">PIXEL ARCADE</h1>
     </header>
 
-    <!-- HOME DASHBOARD -->
+    <!-- MAIN HOME HUB -->
     <div id="homeView" class="view active">
-        <p class="subtitle">Select a cozy activity to begin! ✨</p>
-        <div class="menu-grid">
-            <div class="game-card card-cafe" onclick="switchView('cafeView', '🐕 Shiba Cafe')">
-                <div class="game-icon">🐕</div>
-                <h3>Shiba Cafe</h3>
+        <p class="hub-subtitle">CHOOSE YOUR ADVENTURE</p>
+        <div class="pixel-grid">
+            <div class="pixel-card card-cafe" onclick="switchView('cafeView', 'SHIBA CAFE')">
+                <div class="pixel-icon">🐕</div>
+                <h3>SHIBA CAFE</h3>
             </div>
-            <div class="game-card card-scrapbook" onclick="switchView('scrapbookView', '✂️ Scrapbook')">
-                <div class="game-icon">✂️</div>
-                <h3>Scrapbook</h3>
+            <div class="pixel-card card-scrapbook" onclick="switchView('scrapbookView', 'SCRAPBOOK')">
+                <div class="pixel-icon">✂️</div>
+                <h3>SCRAPBOOK</h3>
             </div>
-            <div class="game-card card-gardening" onclick="switchView('gardeningView', '🌱 Tiny Garden')">
-                <div class="game-icon">🌱</div>
-                <h3>Gardening</h3>
+            <div class="pixel-card card-gardening" onclick="switchView('gardeningView', 'REAL GARDEN')">
+                <div class="pixel-icon">🌱</div>
+                <h3>TINY GARDEN</h3>
             </div>
-            <div class="game-card card-pet" onclick="switchView('petView', '💖 My Virtual Pet')">
-                <div class="game-icon">👾</div>
-                <h3>Tamagotchi Pet</h3>
+            <div class="pixel-card card-pet" onclick="switchView('petView', 'TAMAGOTCHI')">
+                <div class="pixel-icon">🐰</div>
+                <h3>MY VIRTUAL PET</h3>
             </div>
-            <div class="game-card card-more" onclick="switchView('starView', '⭐ Star Catcher')">
-                <div class="game-icon">⭐</div>
-                <h3>Star Catcher</h3>
+            <div class="pixel-card card-star" onclick="switchView('starView', 'STAR JAR')">
+                <div class="pixel-icon">🏺</div>
+                <h3>STAR CATCHER</h3>
             </div>
         </div>
     </div>
 
-    <!-- SHIBA CAFE SIMULATION -->
+    <!-- 1. SHIBA RESTAURAUNT SIMULATION -->
     <div id="cafeView" class="view">
-        <div class="game-container">
-            <div class="cafe-display">
-                <div>💰 Earnings: $<span id="cafeMoney">0</span></div>
-                <div>✨ Happy Customers: <span id="cafeCustomers">0</span></div>
+        <div class="game-wrapper">
+            <p class="game-desc">Use [W,A,S,D] or On-Screen arrows to walk, sit with customers, and fetch coffee!</p>
+            <div class="hud-bar">
+                <span>CASH: $<span id="cafeCash">0</span></span>
             </div>
-            <div class="shiba-image" id="shibaPet">🐕</div>
-            <p id="cafeText" class="game-text">A hungry customer arrived! They want Coffee ☕</p>
-            <button class="btn-action" onclick="serveOrder('☕')">Serve Coffee ☕</button>
-            <button class="btn-action" onclick="serveOrder('🍩')">Serve Donut 🍩</button>
-            <button class="btn-action" onclick="serveOrder('🍵')">Serve Matcha 🍵</button>
+            <canvas id="cafeCanvas" width="600" height="350"></canvas>
+            <div class="dpad">
+                <button class="pixel-btn" onclick="moveShiba(0, -20)">▲</button>
+                <div>
+                    <button class="pixel-btn" onclick="moveShiba(-20, 0)">◀</button>
+                    <button class="pixel-btn" onclick="moveShiba(20, 0)">▶</button>
+                </div>
+                <button class="pixel-btn" onclick="moveShiba(0, 20)">▼</button>
+            </div>
         </div>
     </div>
 
-    <!-- SCRAPBOOK DESIGNING -->
+    <!-- 2. SCRAPBOOK DESIGNING WITH TEXT, DRAWING, & TAPE -->
     <div id="scrapbookView" class="view">
-        <div class="game-container">
-            <p class="game-text">Click a sticker below to add it, then drag it around!</p>
-            <div class="canvas-area" id="scrapbookCanvas"></div>
-            <div class="palette">
-                <div class="palette-item" onclick="addSticker('🌸')">🌸</div>
-                <div class="palette-item" onclick="addSticker('🧸')">🧸</div>
-                <div class="palette-item" onclick="addSticker('🎀')">🎀</div>
-                <div class="palette-item" onclick="addSticker('🐱')">🐱</div>
-                <div class="palette-item" onclick="addSticker('🍄')">🍄</div>
-                <div class="palette-item" onclick="addSticker('☁️')">☁️</div>
+        <div class="game-wrapper">
+            <div class="scrapbook-toolbar">
+                <input type="text" id="scrapbookTextInput" placeholder="Type text...">
+                <button class="pixel-btn" onclick="addCustomText()">+ TEXT</button>
+                <button class="pixel-btn" onclick="setScrapTool('draw')">✏️ DRAW</button>
+                <button class="pixel-btn" onclick="setScrapTool('tape')">🩹 TAPE</button>
+                <button class="pixel-btn" onclick="setScrapTool('sticker')">🌸 STICKER</button>
+                <button class="pixel-btn reset-btn" onclick="clearScrapbook()">CLEAR</button>
             </div>
-            <button class="btn-action clear-btn" onclick="clearScrapbook()">Clear All</button>
+            <div class="canvas-container">
+                <div id="scrapbookCanvas">
+                    <canvas id="drawingLayer" width="600" height="350"></canvas>
+                </div>
+            </div>
         </div>
     </div>
 
-    <!-- GARDENING THING -->
+    <!-- 3. REAL AUTOMATIC GARDENING -->
     <div id="gardeningView" class="view">
-        <div class="game-container">
-            <p class="game-text">Tap a garden plot to tend your sprouts!</p>
-            <div class="garden-bed">
-                <div class="plot" id="plot1" onclick="tendPlot(1)">🟤</div>
-                <div class="plot" id="plot2" onclick="tendPlot(2)">🟤</div>
-                <div class="plot" id="plot3" onclick="tendPlot(3)">🟤</div>
+        <div class="game-wrapper">
+            <p class="game-desc">Crops grow automatically over time. Keep them watered or upgrade tools!</p>
+            <div class="hud-bar">
+                <span>BERRIES: <span id="berryCount">0</span></span>
             </div>
-            <p id="gardenStatus" class="status-italic">Plots are ready for planting seeds.</p>
+            <div class="garden-field">
+                <div class="garden-plot" id="gPlot1" onclick="interactPlot(1)"><div class="dirt">🟤</div></div>
+                <div class="garden-plot" id="gPlot2" onclick="interactPlot(2)"><div class="dirt">🟤</div></div>
+                <div class="garden-plot" id="gPlot3" onclick="interactPlot(3)"><div class="dirt">🟤</div></div>
+            </div>
+            <div class="shop-shelf">
+                <button class="pixel-btn" onclick="buyGardenUpgrade()">Buy Auto-Sprinkler (Cost: 15 Berries)</button>
+            </div>
         </div>
     </div>
 
-    <!-- TAMAGOTCHI PET -->
+    <!-- 4. INTERACTIVE TAMAGOTCHI -->
     <div id="petView" class="view">
-        <div class="game-container">
-            <div id="petEmoji">🐰</div>
-            <div class="status-container">
-                <label>Hunger 🥕</label>
-                <div class="status-bar"><div class="progress" id="hungerBar"></div></div>
-                <label>Happiness 💕</label>
-                <div class="status-bar"><div class="progress" id="happyBar"></div></div>
+        <div class="game-wrapper">
+            <div class="pet-screen">
+                <div id="petSpeech">"Play with me!"</div>
+                <div id="pixelPet">🐰</div>
             </div>
-            <div class="action-row">
-                <button class="btn-action" onclick="feedPet()">Feed 🥕</button>
-                <button class="btn-action" onclick="playPet()">Play ✨</button>
+            <div class="stats-grid">
+                <div>HUNGER: <span id="p_hunger">100</span>%</div>
+                <div>LOVE: <span id="p_love">100</span>%</div>
+                <div>ENERGY: <span id="p_energy">100</span>%</div>
+            </div>
+            <div class="pet-actions">
+                <button class="pixel-btn" onclick="petAction('feed')">🥕 FEED</button>
+                <button class="pixel-btn" onclick="petAction('play')">🎮 PLAY</button>
+                <button class="pixel-btn" onclick="petAction('sleep')">💤 SLEEP</button>
+                <button class="pixel-btn" onclick="petAction('clean')">🧼 CLEAN</button>
             </div>
         </div>
     </div>
 
-    <!-- STAR CATCHER MINI-GAME -->
+    <!-- 5. ADVANCED STAR JAR & ITEM SHOP -->
     <div id="starView" class="view">
-        <div class="game-container">
-            <p class="game-text">Move mouse/finger inside box to catch stars! Score: <span id="starScore">0</span></p>
-            <canvas id="game-canvas" width="400" height="250"></canvas>
-            <button class="btn-action" onclick="startStarGame()">Restart Game</button>
+        <div class="game-wrapper">
+            <div class="hud-bar">
+                <span>STARS: <span id="starBank">0</span></span>
+                <span>LEVEL: <span id="jarLevel">1</span></span>
+            </div>
+            <canvas id="starCanvas" width="600" height="300"></canvas>
+            <div class="shop-shelf">
+                <button class="pixel-btn" id="buyNetBtn" onclick="buyStarUpgrade('net')">Upgrade Net Size (Cost: 10 Stars)</button>
+                <button class="pixel-btn" id="buyJarBtn" onclick="buyStarUpgrade('jar')">Upgrade Jar Multiplier (Cost: 20 Stars)</button>
+            </div>
         </div>
     </div>
 </div>
 
-<!-- Main Game Logic Script -->
 <script src="app.js"></script>
 </body>
 </html>
