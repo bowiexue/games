@@ -3,7 +3,12 @@
 // ==========================================
 function switchView(viewId, title) {
     document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-    document.getElementById(viewId).classList.add('active');
+    
+    const targetView = document.getElementById(viewId);
+    if (targetView) {
+        targetView.classList.add('active');
+    }
+    
     document.getElementById('mainTitle').innerText = title;
     document.getElementById('backBtn').style.display = 'block';
 
@@ -76,7 +81,7 @@ function addSticker(emoji) {
     // Touch Event Listeners (Mobile compatibility)
     sticker.addEventListener('touchstart', () => { isDragging = true; });
     window.addEventListener('touchmove', (e) => {
-        if (isDragging && e.touches.length > 0) {
+        if (isDragging && e.touches && e.touches.length > 0) {
             const rect = canvas.getBoundingClientRect();
             let x = e.touches[0].clientX - rect.left - 20;
             let y = e.touches[0].clientY - rect.top - 20;
@@ -121,13 +126,19 @@ let hunger = 80;
 let happiness = 70;
 
 function updatePetUI() {
-    document.getElementById('hungerBar').style.width = hunger + '%';
-    document.getElementById('happyBar').style.width = happiness + '%';
+    const hungerBar = document.getElementById('hungerBar');
+    const happyBar = document.getElementById('happyBar');
+    const petEmoji = document.getElementById('petEmoji');
     
-    if (hunger < 30 || happiness < 30) {
-        document.getElementById('petEmoji').innerText = '🥺';
-    } else {
-        document.getElementById('petEmoji').innerText = '🐰';
+    if(hungerBar) hungerBar.style.width = hunger + '%';
+    if(happyBar) happyBar.style.width = happiness + '%';
+    
+    if (petEmoji) {
+        if (hunger < 30 || happiness < 30) {
+            petEmoji.innerText = '🥺';
+        } else {
+            petEmoji.innerText = '🐰';
+        }
     }
 }
 
@@ -143,7 +154,8 @@ function playPet() {
 
 // Decay pet stats every 3 seconds while viewing game
 setInterval(() => {
-    if (document.getElementById('petView').classList.contains('active')) {
+    const petView = document.getElementById('petView');
+    if (petView && petView.classList.contains('active')) {
         hunger = Math.max(0, hunger - 4);
         happiness = Math.max(0, happiness - 3);
         updatePetUI();
@@ -157,7 +169,7 @@ updatePetUI();
 // 5. STAR CATCHER SYSTEM ARCHITECTURE
 // ==========================================
 const canvas = document.getElementById('game-canvas');
-const ctx = canvas.getContext('2d');
+const ctx = canvas ? canvas.getContext('2d') : null;
 let gameInterval;
 let score = 0;
 let playerX = 200;
@@ -166,6 +178,7 @@ let starY = 0;
 let starSpeed = 3;
 
 function startStarGame() {
+    if (!canvas) return;
     score = 0;
     starY = 0;
     starSpeed = 3;
@@ -178,25 +191,32 @@ function stopStarGame() {
     clearInterval(gameInterval);
 }
 
-canvas.addEventListener('mousemove', (e) => {
-    const rect = canvas.getBoundingClientRect();
-    playerX = e.clientX - rect.left;
-});
-
-canvas.addEventListener('touchmove', (e) => {
-    if (e.touches.length > 0) {
+if (canvas) {
+    canvas.addEventListener('mousemove', (e) => {
         const rect = canvas.getBoundingClientRect();
-        playerX = e.touches[0].clientX - rect.left;
-    }
-});
+        playerX = e.clientX - rect.left;
+    });
+
+    canvas.addEventListener('touchmove', (e) => {
+        if (e.touches && e.touches.length > 0) {
+            const rect = canvas.getBoundingClientRect();
+            playerX = e.touches[0].clientX - rect.left;
+        }
+    });
+}
 
 function updateStarGame() {
+    if (!ctx || !canvas) return;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     
     // Draw Basket
     ctx.fillStyle = '#ffb6c1';
     ctx.beginPath();
-    ctx.roundRect(playerX - 25, 230, 50, 15, 5);
+    if(ctx.roundRect) {
+        ctx.roundRect(playerX - 25, 230, 50, 15, 5);
+    } else {
+        ctx.rect(playerX - 25, 230, 50, 15);
+    }
     ctx.fill();
     
     // Falling Star setup
