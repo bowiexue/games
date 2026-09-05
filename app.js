@@ -1,242 +1,393 @@
 // ==========================================
-// VIEW MANAGER INTERFACE
+// CORE HUB CONTROLLER
 // ==========================================
 function switchView(viewId, title) {
     document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-    
-    const targetView = document.getElementById(viewId);
-    if (targetView) {
-        targetView.classList.add('active');
-    }
+    const target = document.getElementById(viewId);
+    if(target) target.classList.add('active');
     
     document.getElementById('mainTitle').innerText = title;
     document.getElementById('backBtn').style.display = 'block';
 
-    if (viewId === 'starView') {
-        startStarGame();
-    }
+    // Launch or reset engines
+    if (viewId === 'cafeView') initCafeGame();
+    if (viewId === 'starView') startStarGame();
+    if (viewId === 'scrapbookView') initScrapbookDraw();
 }
 
 function showHome() {
     document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
     document.getElementById('homeView').classList.add('active');
-    document.getElementById('mainTitle').innerText = 'Cozy Arcade';
+    document.getElementById('mainTitle').innerText = 'PIXEL ARCADE';
     document.getElementById('backBtn').style.display = 'none';
+    
     stopStarGame();
+    stopCafeGame();
 }
 
 // ==========================================
-// 1. SHIBA DOG CAFE SIMULATION
+// 1. OPEN-WORLD SHIBA RESTAURANT ENGINE
 // ==========================================
-let cafeMoney = 0;
-let cafeCustomers = 0;
-const items = ['☕', '🍩', '🍵'];
-let currentOrder = '☕';
+let cafeCanvas, cafeCtx, cafeLoop;
+let shiba = { x: 80, y: 160, size: 24, targetSeat: null, itemCarried: null };
+let orders = [
+    { x: 300, y: 100, status: 'WAITING', item: '☕', timer: 300 },
+    { x: 300, y: 240, status: 'WAITING', item: '🍩', timer: 400 }
+];
+let cafeCash = 0;
 
-function serveOrder(item) {
-    if (item === currentOrder) {
-        cafeMoney += 5;
-        cafeCustomers += 1;
-        document.getElementById('cafeMoney').innerText = cafeMoney;
-        document.getElementById('cafeCustomers').innerText = cafeCustomers;
-        document.getElementById('shibaPet').innerText = '🐶✨';
+function initCafeGame() {
+    cafeCanvas = document.getElementById('cafeCanvas');
+    if (!cafeCanvas) return;
+    cafeCtx = cafeCanvas.getContext('2d');
+    shiba.x = 80; shiba.y = 160; shiba.itemCarried = null;
+    clearInterval(cafeLoop);
+    cafeLoop = setInterval(updateCafe, 100);
+}
+function stopCafeGame() { clearInterval(cafeLoop); }
+
+window.addEventListener('keydown', (e) => {
+    const view = document.getElementById('cafeView');
+    if (!view || !view.classList.contains('active')) return;
+    if (e.key.toLowerCase() === 'w') moveShiba(0, -20);
+    if (e.key.toLowerCase() === 's') moveShiba(0, 20);
+    if (e.key.toLowerCase() === 'a') moveShiba(-20, 0);
+    if (e.key.toLowerCase() === 'd') moveShiba(20, 0);
+});
+
+function moveShiba(dx, dy) {
+    if (!cafeCanvas) return;
+    shiba.x = Math.max(20, Math.min(cafeCanvas.width - 40, shiba.x + dx));
+    shiba.y = Math.max(40, Math.min(cafeCanvas.height - 40, shiba.y + dy));
+
+    // Kitchen Interaction Zone (Left side counter)
+    if (shiba.x < 120 && shiba.y < 120) shiba.itemCarried = '☕';
+    if (shiba.x < 120 && shiba.y > 200) shiba.itemCarried = '🍩';
+
+    // Table delivery checker
+    orders.forEach(order => {
+        let dist = Math.hypot((shiba.x - order.x), (shiba.y - order.y));
+        if (dist < 40 && order.status === 'WAITING' && shiba.itemCarried === order.item) {
+            order.status = 'SERVED';
+            cafeCash += 15;
+            document.getElementById('cafeCash').innerText = cafeCash;
+            shiba.itemCarried = null;
+            setTimeout(() => { resetTable(order); }, 3000);
+        }
+    });
+}
+
+function resetTable(order) {
+    order.status = 'WAITING';
+    order.item = Math.random() > 0.5 ? '☕' : '🍩';
+}
+
+function updateCafe() {
+    if (!cafeCtx || !cafeCanvas) return;
+    cafeCtx.clearRect(0, 0, cafeCanvas.width, cafeCanvas.height);
+    
+    // Draw Kitchen counters
+    cafeCtx.fillStyle = '#4e4e63';
+    cafeCtx.fillRect(0, 0, 100, 100);
+    cafeCtx.fillRect(0, 220, 100, 100);
+    
+    cafeCtx.fillStyle = '#fff';
+    cafeCtx.font = '12px Courier';
+    cafeCtx.fillText('☕ COUNTER', 5, 50);
+    cafeCtx.fillText('🍩 COUNTER', 5, 270);
+
+    // Draw Dining Tables
+    orders.forEach(order => {
+        cafeCtx.fillStyle = '#8b5a2b';
+        cafeCtx.fillRect(order.x, order.y, 60, 40);
         
-        currentOrder = items[Math.floor(Math.random() * items.length)];
-        document.getElementById('cafeText').innerText = `Yum! Next customer wants an item: ${currentOrder}`;
-        
-        setTimeout(() => { document.getElementById('shibaPet').innerText = '🐕'; }, 600);
-    } else {
-        document.getElementById('cafeText').innerText = `Oops! They wanted ${currentOrder}. Try again!`;
+        // Draw Customers
+        cafeCtx.font = '20px sans-serif';
+        if (order.status === 'WAITING') {
+            cafeCtx.fillText('🐱', order.x + 15, order.y - 10);
+            cafeCtx.font = '10px "Press Start 2P"';
+            cafeCtx.fillStyle = '#ffadad';
+            cafeCtx.fillText(`WANT:${order.item}`, order.x - 10, order.y - 30);
+        } else {
+            cafeCtx.fillText('😋✨', order.x + 10, order.y - 10);
+        }
+    });
+
+    // Draw Shiba Character
+    cafeCtx.font = '28px sans-serif';
+    cafeCtx.fillText('🐕', shiba.x, shiba.y);
+    if(shiba.itemCarried) {
+        cafeCtx.font = '14px sans-serif';
+        cafeCtx.fillText(shiba.itemCarried, shiba.x + 10, shiba.y - 20);
     }
 }
 
 // ==========================================
-// 2. SCRAPBOOK DESIGN INTERACTION
+// 2. SCRAPBOOK DESIGN INTERACTIVITY LAYER
 // ==========================================
-function addSticker(emoji) {
-    const canvas = document.getElementById('scrapbookCanvas');
-    const sticker = document.createElement('div');
-    sticker.className = 'sticker';
-    sticker.innerText = emoji;
-    sticker.style.left = '50px';
-    sticker.style.top = '50px';
+let currentScrapTool = 'sticker';
+let scrapCanvas, drawCtx, isPainting = false;
+
+function initScrapbookDraw() {
+    scrapCanvas = document.getElementById('drawingLayer');
+    if (!scrapCanvas) return;
+    drawCtx = scrapCanvas.getContext('2d');
     
-    let isDragging = false;
-    
-    // Mouse Event Listeners
-    sticker.addEventListener('mousedown', () => { isDragging = true; });
-    window.addEventListener('mousemove', (e) => {
-        if (isDragging) {
-            const rect = canvas.getBoundingClientRect();
-            let x = e.clientX - rect.left - 20;
-            let y = e.clientY - rect.top - 20;
-            x = Math.max(0, Math.min(x, rect.width - 40));
-            y = Math.max(0, Math.min(y, rect.height - 40));
-            sticker.style.left = x + 'px';
-            sticker.style.top = y + 'px';
+    scrapCanvas.onmousedown = (e) => {
+        if(currentScrapTool !== 'draw') return;
+        isPainting = true;
+        drawCtx.beginPath();
+        drawCtx.moveTo(e.offsetX, e.offsetY);
+    };
+    scrapCanvas.onmousemove = (e) => {
+        if(isPainting && currentScrapTool === 'draw') {
+            drawCtx.lineTo(e.offsetX, e.offsetY);
+            drawCtx.strokeStyle = '#a29bfe';
+            drawCtx.lineWidth = 4;
+            drawCtx.stroke();
+        }
+    };
+    window.addEventListener('mouseup', () => isPainting = false);
+
+    // Dynamic Element placement via clicks
+    const cBox = document.getElementById('scrapbookCanvas');
+    if (cBox) {
+        cBox.onclick = function(e) {
+            if (e.target.id !== 'drawingLayer') return;
+            if (currentScrapTool === 'sticker') createScrapItem('🌸', e.offsetX, e.offsetY, 'text');
+            if (currentScrapTool === 'tape') createScrapItem('', e.offsetX, e.offsetY, 'tape');
+        };
+    }
+}
+
+function setScrapTool(tool) { currentScrapTool = tool; }
+
+function addCustomText() {
+    const txt = document.getElementById('scrapbookTextInput').value;
+    if(txt) createScrapItem(txt, 100, 100, 'text');
+}
+
+function createScrapItem(content, x, y, type) {
+    const container = document.getElementById('scrapbookCanvas');
+    const el = document.createElement('div');
+    el.className = 'scrapbook-element ' + (type === 'tape' ? 'scrapbook-tape' : '');
+    if(type === 'text') el.innerText = content;
+    el.style.left = x + 'px';
+    el.style.top = y + 'px';
+
+    let holds = false;
+    el.onmousedown = () => holds = true;
+    window.addEventListener('mousemove', (ev) => {
+        if(holds) {
+            const bound = container.getBoundingClientRect();
+            el.style.left = (ev.clientX - bound.left - 15) + 'px';
+            el.style.top = (ev.clientY - bound.top - 15) + 'px';
         }
     });
-    window.addEventListener('mouseup', () => { isDragging = false; });
-
-    // Touch Event Listeners (Mobile compatibility)
-    sticker.addEventListener('touchstart', () => { isDragging = true; });
-    window.addEventListener('touchmove', (e) => {
-        if (isDragging && e.touches && e.touches.length > 0) {
-            const rect = canvas.getBoundingClientRect();
-            let x = e.touches[0].clientX - rect.left - 20;
-            let y = e.touches[0].clientY - rect.top - 20;
-            x = Math.max(0, Math.min(x, rect.width - 40));
-            y = Math.max(0, Math.min(y, rect.height - 40));
-            sticker.style.left = x + 'px';
-            sticker.style.top = y + 'px';
-        }
-    });
-    window.addEventListener('touchend', () => { isDragging = false; });
-
-    canvas.appendChild(sticker);
+    window.addEventListener('mouseup', () => holds = false);
+    container.appendChild(el);
 }
 
 function clearScrapbook() {
-    document.getElementById('scrapbookCanvas').innerHTML = '';
+    if (drawCtx && scrapCanvas) drawCtx.clearRect(0, 0, scrapCanvas.width, scrapCanvas.height);
+    document.querySelectorAll('.scrapbook-element').forEach(el => el.remove());
 }
-
 // ==========================================
-// 3. COZY GARDENING ENGINE
+// 3. REAL TICK-BASED AUTOMATIC GARDENING
 // ==========================================
-const plotStates = { 1: 0, 2: 0, 3: 0 };
-const stages = ['🟤', '🌱', '🌿', '🌸'];
+let plots = {
+    1: { stage: 0, watered: false, timer: 0 },
+    2: { stage: 0, watered: false, timer: 0 },
+    3: { stage: 0, watered: false, timer: 0 }
+};
+let berries = 0;
+let autoSprinkler = false;
 
-function tendPlot(id) {
-    plotStates[id] = (plotStates[id] + 1) % stages.length;
-    document.getElementById(`plot${id}`).innerText = stages[plotStates[id]];
-    
-    if (stages[plotStates[id]] === '🌸') {
-        document.getElementById('gardenStatus').innerText = "Beautiful! A flower bloomed!";
-    } else if (stages[plotStates[id]] === '🟤') {
-        document.getElementById('gardenStatus').innerText = "Harvested! Ready to plant again.";
-    } else {
-        document.getElementById('gardenStatus').innerText = "Watered! It's growing.";
-    }
-}
+// Idle Tick System loops every 1 second
+setInterval(() => {
+    for (let id in plots) {
+        let p = plots[id];
+        if (autoSprinkler) p.watered = true;
 
-// ==========================================
-// 4. TAMAGOTCHI PET CONTROLLER
-// ==========================================
-let hunger = 80;
-let happiness = 70;
-
-function updatePetUI() {
-    const hungerBar = document.getElementById('hungerBar');
-    const happyBar = document.getElementById('happyBar');
-    const petEmoji = document.getElementById('petEmoji');
-    
-    if(hungerBar) hungerBar.style.width = hunger + '%';
-    if(happyBar) happyBar.style.width = happiness + '%';
-    
-    if (petEmoji) {
-        if (hunger < 30 || happiness < 30) {
-            petEmoji.innerText = '🥺';
-        } else {
-            petEmoji.innerText = '🐰';
+        if (p.stage > 0 && p.stage < 3 && p.watered) {
+            p.timer++;
+            if (p.timer >= 5) { // Evolves stage every 5 seconds
+                p.stage++;
+                p.timer = 0;
+                p.watered = autoSprinkler; 
+                renderPlots();
+            }
         }
     }
+}, 1000);
+
+function renderPlots() {
+    const assets = ['🟤', '🌱', '🌿', '🍓'];
+    for (let id in plots) {
+        let p = plots[id];
+        let txt = assets[p.stage];
+        if (p.watered && p.stage < 3 && p.stage > 0) txt += '💧';
+        const plotEl = document.getElementById(`gPlot${id}`);
+        if (plotEl) plotEl.innerHTML = `<div class="dirt">${txt}</div>`;
+    }
 }
 
-function feedPet() {
-    hunger = Math.min(100, hunger + 15);
-    updatePetUI();
+function interactPlot(id) {
+    let p = plots[id];
+    if (p.stage === 0) { // Plant seed
+        p.stage = 1;
+    } else if (p.stage < 3 && !p.watered) { // Water plant
+        p.watered = true;
+    } else if (p.stage === 3) { // Harvest fully grown berry
+        berries += 5;
+        document.getElementById('berryCount').innerText = berries;
+        p.stage = 0;
+        p.watered = false;
+    }
+    renderPlots();
 }
 
-function playPet() {
-    happiness = Math.min(100, happiness + 15);
-    updatePetUI();
+function buyGardenUpgrade() {
+    if (berries >= 15 && !autoSprinkler) {
+        berries -= 15;
+        autoSprinkler = true;
+        document.getElementById('berryCount').innerText = berries;
+        renderPlots();
+    }
 }
 
-// Decay pet stats every 3 seconds while viewing game
+// ==========================================
+// 4. INTERACTIVE TAMAGOTCHI PET CONTROLLER
+// ==========================================
+let petStats = { hunger: 100, love: 100, energy: 100, status: 'HAPPY' };
+
+function petAction(act) {
+    const msg = document.getElementById('petSpeech');
+    const emo = document.getElementById('pixelPet');
+    if (!msg || !emo) return;
+
+    if (act === 'feed') {
+        petStats.hunger = Math.min(100, petStats.hunger + 25);
+        msg.innerText = '"Chomp chomp! Tasty!"';
+        emo.innerText = '😋';
+    } else if (act === 'play') {
+        if(petStats.energy < 20) {
+            msg.innerText = '"Too tired to play..."';
+            return;
+        }
+        petStats.love = Math.min(100, petStats.love + 20);
+        petStats.energy = Math.max(0, petStats.energy - 15);
+        msg.innerText = '"Yay! More games!"';
+        emo.innerText = '🥳';
+    } else if (act === 'sleep') {
+        petStats.energy = 100;
+        msg.innerText = '"Zzz... sleeping..."';
+        emo.innerText = '😴';
+    } else if (act === 'clean') {
+        msg.innerText = '"Sparkling clean!"';
+        emo.innerText = '✨🐰✨';
+    }
+    refreshPetUI();
+}
+
 setInterval(() => {
     const petView = document.getElementById('petView');
-    if (petView && petView.classList.contains('active')) {
-        hunger = Math.max(0, hunger - 4);
-        happiness = Math.max(0, happiness - 3);
-        updatePetUI();
+    if (!petView || !petView.classList.contains('active')) return;
+    petStats.hunger = Math.max(0, petStats.hunger - 3);
+    petStats.love = Math.max(0, petStats.love - 2);
+    petStats.energy = Math.max(0, petStats.energy - 1);
+    
+    if(petStats.hunger < 40 || petStats.love < 40) {
+        document.getElementById('petSpeech').innerText = '"I need attention..."';
+        document.getElementById('pixelPet').innerText = '🥺';
     }
-}, 3000);
+    refreshPetUI();
+}, 4000);
 
-// Set default rendering states on initialization
-updatePetUI();
+function refreshPetUI() {
+    const h = document.getElementById('p_hunger');
+    const l = document.getElementById('p_love');
+    const e = document.getElementById('p_energy');
+    if (h) h.innerText = petStats.hunger;
+    if (l) l.innerText = petStats.love;
+    if (e) e.innerText = petStats.energy;
+}
+
+// Set default layout setup on load
+setTimeout(refreshPetUI, 200);
 
 // ==========================================
-// 5. STAR CATCHER SYSTEM ARCHITECTURE
+// 5. ADVANCED STAR JAR PLATFORM ENGINE
 // ==========================================
-const canvas = document.getElementById('game-canvas');
-const ctx = canvas ? canvas.getContext('2d') : null;
-let gameInterval;
-let score = 0;
-let playerX = 200;
-let starX = Math.random() * 380 + 10;
-let starY = 0;
-let starSpeed = 3;
+let starCanvas, sCtx, starLoop;
+let starsCollected = 0;
+let jarLevelSetting = 1, basketWidth = 60;
+let starBox = { x: 300, y: 270 };
+let activeStars = [];
 
 function startStarGame() {
-    if (!canvas) return;
-    score = 0;
-    starY = 0;
-    starSpeed = 3;
-    document.getElementById('starScore').innerText = score;
-    clearInterval(gameInterval);
-    gameInterval = setInterval(updateStarGame, 20);
+    starCanvas = document.getElementById('starCanvas');
+    if (!starCanvas) return;
+    sCtx = starCanvas.getContext('2d');
+    activeStars = [];
+    clearInterval(starLoop);
+    starLoop = setInterval(runStarCycle, 30);
+    
+    // Attach listener once canvas object initializes
+    starCanvas.onmousemove = (e) => {
+        const r = starCanvas.getBoundingClientRect();
+        starBox.x = e.clientX - r.left;
+    };
 }
 
-function stopStarGame() {
-    clearInterval(gameInterval);
-}
+function stopStarGame() { clearInterval(starLoop); }
 
-if (canvas) {
-    canvas.addEventListener('mousemove', (e) => {
-        const rect = canvas.getBoundingClientRect();
-        playerX = e.clientX - rect.left;
-    });
+function runStarCycle() {
+    if (!sCtx || !starCanvas) return;
+    sCtx.clearRect(0, 0, starCanvas.width, starCanvas.height);
+    
+    // Periodically spawn stars
+    if(Math.random() < 0.06) {
+        activeStars.push({ x: Math.random() * (starCanvas.width - 20) + 10, y: 0, speed: Math.random() * 3 + 2 });
+    }
 
-    canvas.addEventListener('touchmove', (e) => {
-        if (e.touches && e.touches.length > 0) {
-            const rect = canvas.getBoundingClientRect();
-            playerX = e.touches[0].clientX - rect.left;
+    // Draw Jar Basket
+    sCtx.fillStyle = '#74b9ff';
+    sCtx.fillRect(starBox.x - (basketWidth/2), starBox.y, basketWidth, 25);
+    sCtx.fillStyle = '#fff';
+    sCtx.font = '10px Courier';
+    sCtx.fillText('JAR', starBox.x - 10, starBox.y + 15);
+
+    // Fall logic
+    for(let i = activeStars.length - 1; i >= 0; i--) {
+        let s = activeStars[i];
+        s.y += s.speed;
+        
+        sCtx.font = '20px sans-serif';
+        sCtx.fillText('⭐', s.x - 10, s.y);
+
+        // Capture check
+        if (s.y >= starBox.y && s.y <= starBox.y + 25 && Math.abs(s.x - starBox.x) < (basketWidth/2 + 5)) {
+            starsCollected += (1 * jarLevelSetting);
+            document.getElementById('starBank').innerText = starsCollected;
+            activeStars.splice(i, 1);
+            continue;
         }
-    });
+        if (s.y > starCanvas.height) activeStars.splice(i, 1);
+    }
 }
 
-function updateStarGame() {
-    if (!ctx || !canvas) return;
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    
-    // Draw Basket
-    ctx.fillStyle = '#ffb6c1';
-    ctx.beginPath();
-    if(ctx.roundRect) {
-        ctx.roundRect(playerX - 25, 230, 50, 15, 5);
-    } else {
-        ctx.rect(playerX - 25, 230, 50, 15);
+function buyStarUpgrade(type) {
+    if(type === 'net' && starsCollected >= 10) {
+        starsCollected -= 10;
+        basketWidth += 25; 
+        document.getElementById('buyNetBtn').innerText = "Max Net Reached";
     }
-    ctx.fill();
-    
-    // Falling Star setup
-    starY += starSpeed;
-    ctx.fillStyle = '#fef1d2';
-    ctx.font = '24px sans-serif';
-    ctx.fillText('⭐', starX - 12, starY);
-
-    // Score Collisions
-    if (starY >= 220 && starY <= 245 && Math.abs(starX - playerX) < 35) {
-        score++;
-        document.getElementById('starScore').innerText = score;
-        starY = 0;
-        starX = Math.random() * 370 + 15;
-        starSpeed += 0.3;
+    if(type === 'jar' && starsCollected >= 20) {
+        starsCollected -= 20;
+        jarLevelSetting += 1;
+        document.getElementById('jarLevel').innerText = jarLevelSetting;
+        document.getElementById('buyJarBtn').innerText = `Jar Multiplier Lvl ${jarLevelSetting}`;
     }
-
-    // Canvas Limits check
-    if (starY > canvas.height) {
-        starY = 0;
-        starX = Math.random() * 370 + 15;
-    }
+    document.getElementById('starBank').innerText = starsCollected;
 }
