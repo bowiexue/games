@@ -3,81 +3,122 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pixel Arcade App</title>
+    <title>Cozy Pixel Application Framework</title>
     <link href="https://googleapis.com" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<div id="app-window">
-    <header>
-        <button id="home-btn" onclick="goToHome()">MENU</button>
-        <h1 id="screen-title">PIXEL SYSTEM</h1>
+<div id="desktop-app-container">
+    <!-- MASTER APP HEADER -->
+    <header class="system-bar">
+        <button id="master-nav-home" class="retro-btn accent-home" onclick="returnToMainMenu()">◀ MENU</button>
+        <h1 id="app-window-title">SYSTEM: CORE_HUB</h1>
     </header>
 
-    <!-- HUB VIEW -->
-    <div id="view-hub" class="game-view active">
-        <div class="menu-grid">
-            <button class="grid-card" onclick="loadGame('cafe')">SHIBA CAFE</button>
-            <button class="grid-card" onclick="loadGame('scrap')">SCRAPBOOK</button>
-            <button class="grid-card" onclick="loadGame('tycoon')">GARDEN TYCOON</button>
-            <button class="grid-card" onclick="loadGame('pet')">VIRTUAL PET</button>
-            <button class="grid-card" onclick="loadGame('catcher')">STAR JAR</button>
+    <!-- HUB VIEW PANEL -->
+    <div id="panel-hub" class="app-view active">
+        <div class="hub-header-region">
+            <h2>SELECT DESKTOP APPLICATION PORTAL</h2>
+        </div>
+        <div class="portal-grid-layout">
+            <button class="portal-button-card tile-cafe" onclick="launchAppView('cafe')">
+                <div class="card-title-text">SHIBA CAFE (TOCA STYLE)</div>
+            </button>
+            <button class="portal-button-card tile-scrap" onclick="launchAppView('scrap')">
+                <div class="card-title-text">SCRAPBOOK (NOTABILITY)</div>
+            </button>
+            <button class="portal-button-card tile-tycoon" onclick="launchAppView('tycoon')">
+                <div class="card-title-text">GARDEN TYCOON (ROBLOX)</div>
+            </button>
+            <button class="portal-button-card tile-pet" onclick="launchAppView('pet')">
+                <div class="card-title-text">TAMAGOTCHI ECOSYSTEM</div>
+            </button>
+            <button class="portal-button-card tile-star" onclick="launchAppView('star')">
+                <div class="card-title-text">STAR JAR HARVESTER</div>
+            </button>
         </div>
     </div>
 
-    <!-- 1. SHIBA CAFE -->
-    <div id="view-cafe" class="game-view">
-        <div class="hud">CASH: $<span id="cafe-cash">0</span> | TASK: <span id="cafe-task">Fetch Drink</span></div>
-        <canvas id="cafeCanvas" width="600" height="360"></canvas>
-    </div>
-
-    <!-- 2. SCRAPBOOK -->
-    <div id="view-scrap" class="game-view">
-        <div class="toolbar">
-            <button onclick="setScrapTool('draw')">DRAW</button>
-            <button onclick="setScrapTool('sticker1')">+HEART</button>
-            <button onclick="setScrapTool('sticker2')">+STAR</button>
-            <input type="color" id="scrap-color" value="#ff6b81">
-            <button onclick="clearScrapbook()">RESET</button>
+    <!-- 1. SHIBA RESTAURANT VIEW (TOCA BOCA MOUSE WALK) -->
+    <div id="panel-cafe" class="app-view">
+        <div class="hud-dashboard-bar">
+            <span>REGISTER CASH: $<span id="lbl-cafe-cash">0</span></span>
+            <span class="hud-divider">|</span>
+            <span>OBJECTIVE: <span id="lbl-cafe-prompt">Go to Drink Station</span></span>
         </div>
-        <canvas id="scrapCanvas" width="600" height="360"></canvas>
+        <div class="canvas-viewport-wrapper">
+            <canvas id="canvasCafe" width="640" height="380"></canvas>
+        </div>
     </div>
 
-    <!-- 3. GARDEN TYCOON -->
-    <div id="view-tycoon" class="game-view">
-        <div class="hud">CRYSTALS: <span id="tycoon-gems">10</span></div>
-        <div class="tycoon-container">
-            <canvas id="tycoonCanvas" width="400" height="360"></canvas>
-            <div class="side-shop">
-                <button onclick="buyTycoonUpgrade('plot')">BUY PLOT (20 C)</button>
-                <button onclick="buyTycoonUpgrade('water')">SPRINKLER (40 C)</button>
+    <!-- 2. SCRAPBOOK PRO VIEW (NOTABILITY NOTEBOOK) -->
+    <div id="panel-scrap" class="app-view">
+        <div class="editor-control-strip">
+            <button class="tool-toggle-btn active" id="tool-draw" onclick="changeScrapbookTool('draw')">INK PEN</button>
+            <button class="tool-toggle-btn" id="tool-sticker1" onclick="changeScrapbookTool('sticker1')">+HEART DECAL</button>
+            <button class="tool-toggle-btn" id="tool-sticker2" onclick="changeScrapbookTool('sticker2')">+STAR DECAL</button>
+            <div class="color-swatch-container">
+                <input type="color" id="input-scrap-hex" value="#ff4757">
+            </div>
+            <button class="retro-btn critical-wipe-btn" onclick="wipeScrapbookCanvas()">WIPE NOTEBOOK</button>
+        </div>
+        <div class="canvas-viewport-wrapper">
+            <canvas id="canvasScrap" width="640" height="380"></canvas>
+        </div>
+    </div>
+
+    <!-- 3. GARDEN TYCOON VIEW (ROBLOX LOOP PROGRESSION) -->
+    <div id="panel-tycoon" class="app-view">
+        <div class="hud-dashboard-bar">
+            <span>TYCOON CRYSTO-GEMS: <span id="lbl-tycoon-gems">10</span></span>
+        </div>
+        <div class="split-game-workspace">
+            <div class="canvas-viewport-wrapper main-canvas-flex">
+                <canvas id="canvasTycoon" width="440" height="380"></canvas>
+            </div>
+            <div class="tycoon-shop-dock">
+                <div class="dock-title">UPGRADE ENGINE</div>
+                <button class="shop-purchase-btn" onclick="triggerTycoonPurchase('plot')">BUY PLOT EXPANSION (20 C)</button>
+                <button class="shop-purchase-btn" onclick="triggerTycoonPurchase('sprinkler')">BUY AUTO-SPRINKLER (40 C)</button>
             </div>
         </div>
     </div>
 
-    <!-- 4. VIRTUAL PET -->
-    <div id="view-pet" class="game-view">
-        <div class="hud">TOKENS: <span id="pet-tokens">0</span> | HUNGER: <span id="pet-hunger">100</span>%</div>
-        <div class="pet-container">
-            <canvas id="petCanvas" width="400" height="300"></canvas>
-            <div class="side-shop">
-                <button onclick="handlePetAction('feed')">FEED TREAT</button>
-                <button onclick="handlePetAction('pet')">PET ANIMAL</button>
-                <button onclick="buyPetCosmetic('hat')">BUY HAT (5 T)</button>
-                <button onclick="buyPetCosmetic('bow')">BUY BOW (3 T)</button>
+    <!-- 4. TAMAGOTCHI PET DEVICE VIEW -->
+    <div id="panel-pet" class="app-view">
+        <div class="hud-dashboard-bar">
+            <span>DEVICE TOKENS: <span id="lbl-pet-tokens">0</span></span>
+            <span class="hud-divider">|</span>
+            <span>VITALITY HUNGER: <span id="lbl-pet-hunger">100</span>%</span>
+        </div>
+        <div class="split-game-workspace">
+            <div class="canvas-viewport-wrapper main-canvas-flex">
+                <canvas id="canvasPet" width="440" height="320"></canvas>
+            </div>
+            <div class="tycoon-shop-dock">
+                <div class="dock-title">PET CONSOLE</div>
+                <button class="shop-purchase-btn" onclick="executePetCommand('feed')">FEED TREAT</button>
+                <button class="shop-purchase-btn" onclick="executePetCommand('pet')">TICKLE / PET</button>
+                <button class="shop-purchase-btn" onclick="executePetBoutiqueBuy('hat')">BUY CROWN HAT (5 T)</button>
+                <button class="shop-purchase-btn" onclick="executePetBoutiqueBuy('bow')">BUY COZY BOW (3 T)</button>
             </div>
         </div>
     </div>
 
-    <!-- 5. STAR JAR -->
-    <div id="view-catcher" class="game-view">
-        <div class="hud">STARS CATCHED: <span id="star-score">0</span></div>
-        <div class="catcher-container">
-            <canvas id="starCanvas" width="440" height="360"></canvas>
-            <div class="side-shop">
-                <button onclick="upgradeNet('#ff4757')">RED NET (10 S)</button>
-                <button onclick="upgradeNet('#1e90ff')">BLUE NET (25 S)</button>
+    <!-- 5. STAR NET JAR VIEW -->
+    <div id="panel-star" class="app-view">
+        <div class="hud-dashboard-bar">
+            <span>JAR INVENTORY COUNT: <span id="lbl-star-score">0</span></span>
+        </div>
+        <div class="split-game-workspace">
+            <div class="canvas-viewport-wrapper main-canvas-flex">
+                <canvas id="canvasStar" width="440" height="380"></canvas>
+            </div>
+            <div class="tycoon-shop-dock">
+                <div class="dock-title">NET FACTORY</div>
+                <button class="shop-purchase-btn" onclick="buyNetUpgradeHex('#ff4757')">SAKURA THREAD (10 S)</button>
+                <button class="shop-purchase-btn" onclick="buyNetUpgradeHex('#1e90ff')">NEBULA CORDE (25 S)</button>
             </div>
         </div>
     </div>
