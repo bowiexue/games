@@ -3,133 +3,134 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>👾 Retro Pixel Arcade 👾</title>
+    <title>✨ Cozy Toca Arcade Hub ✨</title>
     <link href="https://googleapis.com" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<div id="arcade-cabinet">
+<div id="cozy-cabinet">
     <header>
-        <button class="pixel-btn back-btn" id="backBtn" onclick="showHome()">◀ HOME</button>
-        <h1 id="mainTitle">PIXEL ARCADE</h1>
+        <button class="cozy-btn back-btn" id="backBtn" onclick="showHome()">🌸 HOME</button>
+        <h1 id="mainTitle">COZY WORLD</h1>
     </header>
 
     <!-- MAIN HOME HUB -->
     <div id="homeView" class="view active">
-        <p class="hub-subtitle">CHOOSE YOUR ADVENTURE</p>
-        <div class="pixel-grid">
-            <div class="pixel-card card-cafe" onclick="switchView('cafeView', 'SHIBA CAFE')">
-                <div class="pixel-icon">🐕</div>
+        <p class="hub-subtitle">Choose a cozy world to enter! ✨</p>
+        <div class="cozy-grid">
+            <div class="cozy-card card-cafe" onclick="switchView('cafeView', '🐕 SHIBA TOCA CAFE')">
+                <div class="card-icon">🐕</div>
                 <h3>SHIBA CAFE</h3>
             </div>
-            <div class="pixel-card card-scrapbook" onclick="switchView('scrapbookView', 'SCRAPBOOK')">
-                <div class="pixel-icon">✂️</div>
+            <div class="cozy-card card-scrapbook" onclick="switchView('scrapbookView', '📝 NOTABILITY SCRAPBOOK')">
+                <div class="card-icon">📝</div>
                 <h3>SCRAPBOOK</h3>
             </div>
-            <div class="pixel-card card-gardening" onclick="switchView('gardeningView', 'REAL GARDEN')">
-                <div class="pixel-icon">🌱</div>
-                <h3>TINY GARDEN</h3>
+            <div class="cozy-card card-gardening" onclick="switchView('gardeningView', '🏡 ROBLOX TYCOON FIELD')">
+                <div class="card-icon">🌻</div>
+                <h3>GROW TYCOON</h3>
             </div>
-            <div class="pixel-card card-pet" onclick="switchView('petView', 'TAMAGOTCHI')">
-                <div class="pixel-icon">🐰</div>
-                <h3>MY VIRTUAL PET</h3>
+            <div class="cozy-card card-pet" onclick="switchView('petView', '💖 TAMAGOTCHI PET WORLD')">
+                <div class="card-icon">🐰</div>
+                <h3>VIRTUAL PET</h3>
             </div>
-            <div class="pixel-card card-star" onclick="switchView('starView', 'STAR JAR')">
-                <div class="pixel-icon">🏺</div>
-                <h3>STAR CATCHER</h3>
+            <div class="cozy-card card-star" onclick="switchView('starView', '🏺 STAR NET JAR')">
+                <div class="card-icon">🍯</div>
+                <h3>STAR JAR</h3>
             </div>
         </div>
     </div>
 
-    <!-- 1. SHIBA RESTAURAUNT SIMULATION -->
+    <!-- 1. TOCA BOCA SHIBA RESTAURANT -->
     <div id="cafeView" class="view">
         <div class="game-wrapper">
-            <p class="game-desc">Use [W,A,S,D] or On-Screen arrows to walk, sit with customers, and fetch coffee!</p>
-            <div class="hud-bar">
-                <span>CASH: $<span id="cafeCash">0</span></span>
-            </div>
-            <canvas id="cafeCanvas" width="600" height="350"></canvas>
-            <div class="dpad">
-                <button class="pixel-btn" onclick="moveShiba(0, -20)">▲</button>
-                <div>
-                    <button class="pixel-btn" onclick="moveShiba(-20, 0)">◀</button>
-                    <button class="pixel-btn" onclick="moveShiba(20, 0)">▶</button>
-                </div>
-                <button class="pixel-btn" onclick="moveShiba(0, 20)">▼</button>
-            </div>
+            <p class="game-desc">Click/Tap anywhere on the floor to make your Shiba walk there like Toca Boca!</p>
+            <div class="hud-bar">💵 Cash: $<span id="cafeCash">0</span></div>
+            <canvas id="cafeCanvas" width="650" height="380"></canvas>
         </div>
     </div>
 
-    <!-- 2. SCRAPBOOK DESIGNING WITH TEXT, DRAWING, & TAPE -->
+    <!-- 2. NOTABILITY-STYLE SCRAPBOOK -->
     <div id="scrapbookView" class="view">
         <div class="game-wrapper">
             <div class="scrapbook-toolbar">
-                <input type="text" id="scrapbookTextInput" placeholder="Type text...">
-                <button class="pixel-btn" onclick="addCustomText()">+ TEXT</button>
-                <button class="pixel-btn" onclick="setScrapTool('draw')">✏️ DRAW</button>
-                <button class="pixel-btn" onclick="setScrapTool('tape')">🩹 TAPE</button>
-                <button class="pixel-btn" onclick="setScrapTool('sticker')">🌸 STICKER</button>
-                <button class="pixel-btn reset-btn" onclick="clearScrapbook()">CLEAR</button>
+                <button class="cozy-btn" onclick="setScrapTool('pen')">✏️ Pen</button>
+                <button class="cozy-btn" onclick="setScrapTool('highlighter')">🖍️ Highlight</button>
+                <button class="cozy-btn" onclick="setScrapTool('text')">🔤 Text Box</button>
+                <button class="cozy-btn" onclick="setScrapTool('sticker')">🎀 Stickers</button>
+                <input type="color" id="scrapColor" value="#ff8da1">
+                <button class="cozy-btn clear-btn" onclick="clearScrapbook()">Reset Page</button>
             </div>
-            <div class="canvas-container">
-                <div id="scrapbookCanvas">
-                    <canvas id="drawingLayer" width="600" height="350"></canvas>
+            <div id="notabilityCanvas">
+                <canvas id="scrapDrawLayer" width="650" height="380"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. ROBLOX "GROW A GARDEN" TYCOON -->
+    <div id="gardeningView" class="view">
+        <div class="game-wrapper">
+            <div class="hud-bar">✨ Tycoon Gems: <span id="tycoonGems">10</span></div>
+            <div class="tycoon-layout">
+                <div class="plots-container">
+                    <div class="tycoon-plot" onclick="clickTycoonPlot(0)"><div id="tp0">🌱 Buy: 5g</div></div>
+                    <div class="tycoon-plot" onclick="clickTycoonPlot(1)"><div id="tp1">🔒 Locked</div></div>
+                    <div class="tycoon-plot" onclick="clickTycoonPlot(2)"><div id="tp2">🔒 Locked</div></div>
+                </div>
+                <div class="upgrade-station">
+                    <h3>🚀 Upgrades</h3>
+                    <button class="cozy-btn" onclick="buyTycoonItem('plot')">Unlock Next Plot (15 Gems)</button>
+                    <button class="cozy-btn" onclick="buyTycoonItem('dropper')">Auto Fertilizer Overdrive (25 Gems)</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- 3. REAL AUTOMATIC GARDENING -->
-    <div id="gardeningView" class="view">
-        <div class="game-wrapper">
-            <p class="game-desc">Crops grow automatically over time. Keep them watered or upgrade tools!</p>
-            <div class="hud-bar">
-                <span>BERRIES: <span id="berryCount">0</span></span>
-            </div>
-            <div class="garden-field">
-                <div class="garden-plot" id="gPlot1" onclick="interactPlot(1)"><div class="dirt">🟤</div></div>
-                <div class="garden-plot" id="gPlot2" onclick="interactPlot(2)"><div class="dirt">🟤</div></div>
-                <div class="garden-plot" id="gPlot3" onclick="interactPlot(3)"><div class="dirt">🟤</div></div>
-            </div>
-            <div class="shop-shelf">
-                <button class="pixel-btn" onclick="buyGardenUpgrade()">Buy Auto-Sprinkler (Cost: 15 Berries)</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- 4. INTERACTIVE TAMAGOTCHI -->
+    <!-- 4. TAMAGOTCHI WORLD WITH ADORNMENT STORE -->
     <div id="petView" class="view">
-        <div class="game-wrapper">
-            <div class="pet-screen">
-                <div id="petSpeech">"Play with me!"</div>
-                <div id="pixelPet">🐰</div>
+        <div class="game-wrapper horizontal-layout">
+            <div class="pet-main-screen">
+                <div class="hud-bar">🎫 Tokens: <span id="petTokens">0</span></div>
+                <div class="pet-avatar-frame">
+                    <div id="petCosmeticLayer"></div>
+                    <div id="tomaPet">🐰</div>
+                </div>
+                <div class="status-bars">
+                    <div>Mood: <span id="pMood">Happy ✨</span></div>
+                    <div class="bar-bg"><div class="bar-fill" id="pHappyFill" style="width: 100%"></div></div>
+                </div>
+                <div class="pet-actions">
+                    <button class="cozy-btn" onclick="interactToma('feed')">🧁 Feed</button>
+                    <button class="cozy-btn" onclick="interactToma('pet')">💕 Pet Me</button>
+                </div>
             </div>
-            <div class="stats-grid">
-                <div>HUNGER: <span id="p_hunger">100</span>%</div>
-                <div>LOVE: <span id="p_love">100</span>%</div>
-                <div>ENERGY: <span id="p_energy">100</span>%</div>
-            </div>
-            <div class="pet-actions">
-                <button class="pixel-btn" onclick="petAction('feed')">🥕 FEED</button>
-                <button class="pixel-btn" onclick="petAction('play')">🎮 PLAY</button>
-                <button class="pixel-btn" onclick="petAction('sleep')">💤 SLEEP</button>
-                <button class="pixel-btn" onclick="petAction('clean')">🧼 CLEAN</button>
+            <div class="toma-store">
+                <h3>🛍️ Adorn Store</h3>
+                <div class="store-grid">
+                    <button class="store-item" onclick="buyTomaAdorn('👑', 5)">👑 Tiara (5t)</button>
+                    <button class="store-item" onclick="buyTomaAdorn('🎀', 3)">🎀 Bowtie (3t)</button>
+                    <button class="store-item" onclick="buyTomaAdorn('🕶️', 8)">🕶️ Glasses (8t)</button>
+                    <button class="store-item" onclick="buyTomaUpgrade('cake', 4)">🍰 Super Cake (4t)</button>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- 5. ADVANCED STAR JAR & ITEM SHOP -->
+    <!-- 5. ADVANCED STAR JAR & NET SHOP -->
     <div id="starView" class="view">
-        <div class="game-wrapper">
-            <div class="hud-bar">
-                <span>STARS: <span id="starBank">0</span></span>
-                <span>LEVEL: <span id="jarLevel">1</span></span>
+        <div class="game-wrapper horizontal-layout">
+            <div class="star-playfield">
+                <canvas id="starCanvas" width="450" height="380"></canvas>
             </div>
-            <canvas id="starCanvas" width="600" height="300"></canvas>
-            <div class="shop-shelf">
-                <button class="pixel-btn" id="buyNetBtn" onclick="buyStarUpgrade('net')">Upgrade Net Size (Cost: 10 Stars)</button>
-                <button class="pixel-btn" id="buyJarBtn" onclick="buyStarUpgrade('jar')">Upgrade Jar Multiplier (Cost: 20 Stars)</button>
+            <div class="star-shop">
+                <h3>🏺 Star Inventory</h3>
+                <div class="hud-bar">⭐ Score: <span id="starBank">0</span></div>
+                <div class="shop-grid">
+                    <button class="cozy-btn" onclick="buyStarNet('🌸 Sakura Net', 10, '#ffb6c1')">Sakura Net (10⭐)</button>
+                    <button class="cozy-btn" onclick="buyStarNet('🌌 Galaxy Net', 25, '#a29bfe')">Galaxy Net (25⭐)</button>
+                    <button class="cozy-btn" onclick="buyStarNet('⚡ Electro Net', 40, '#ffd3b6')">Turbo Net (40⭐)</button>
+                </div>
             </div>
         </div>
     </div>
