@@ -177,11 +177,12 @@ function bootstrapCafeEngine() {
         }
     }, 35);
 }
-// ==========================================
-// 2. MODULE: SCRAPBOOK NOTEBOOK (NOTABILITY SUITE)
-// ==========================================
+// ============================================================================
+// 2. MODULE: SCRAPBOOK NOTEBOOK (ADVANCED NOTABILITY INTERACTION SYSTEM)
+// ============================================================================
 let currentActiveScrapTool = 'draw';
-let boardVectorRegistry = [];
+let boardVectorRegistry = []; // Stores stamped shapes & washi tapes
+let scrapbookActiveTemplate = 'blank';
 
 function bootstrapScrapbookEngine() {
     const canvas = document.getElementById('canvasScrap');
@@ -189,35 +190,58 @@ function bootstrapScrapbookEngine() {
     const ctx = canvas.getContext('2d');
     let userPaintingAllowed = false;
 
+    // Redraw templates immediately on load setup
+    drawActiveNotebookTemplate(ctx, canvas);
+
     canvas.onmousedown = function(event) {
         const bounds = canvas.getBoundingClientRect();
         const mouseX = event.clientX - bounds.left;
         const mouseY = event.clientY - bounds.top;
+        const selectedSize = parseInt(document.getElementById('scrap-size-select').value, 10);
+        const selectedColor = document.getElementById('input-scrap-hex').value;
 
-        if(currentActiveScrapTool === 'draw') {
+        if (currentActiveScrapTool === 'draw' || currentActiveScrapTool === 'erase') {
             userPaintingAllowed = true;
             ctx.beginPath();
             ctx.moveTo(mouseX, mouseY);
-        } else if(currentActiveScrapTool === 'sticker1') {
-            boardVectorRegistry.push({ type: 'heart', x: mouseX, y: mouseY, color: document.getElementById('input-scrap-hex').value });
-            refreshScrapbookCanvasLayer(ctx, canvas);
-        } else if(currentActiveScrapTool === 'sticker2') {
-            boardVectorRegistry.push({ type: 'star', x: mouseX, y: mouseY });
-            refreshScrapbookCanvasLayer(ctx, canvas);
+            
+            // Set styles dynamically
+            ctx.strokeStyle = currentActiveScrapTool === 'erase' ? '#fafafa' : selectedColor;
+            ctx.lineWidth = selectedSize;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+        } else if (currentActiveScrapTool === 'tape') {
+            // Draw a standard 16-bit translucent decorative strip tape line
+            boardVectorRegistry.push({ type: 'tape', x: mouseX - 25, y: mouseY - 8, color: selectedColor });
+            refreshMasterScrapbookLayers(ctx, canvas);
+        } else if (currentActiveScrapTool === 'sticker1') {
+            boardVectorRegistry.push({ type: 'heart', x: mouseX - 10, y: mouseY - 10, color: selectedColor });
+            refreshMasterScrapbookLayers(ctx, canvas);
+        } else if (currentActiveScrapTool === 'sticker2') {
+            boardVectorRegistry.push({ type: 'star', x: mouseX - 10, y: mouseY - 10 });
+            refreshMasterScrapbookLayers(ctx, canvas);
         }
     };
 
     canvas.onmousemove = function(event) {
-        if(!userPaintingAllowed || currentActiveScrapTool !== 'draw') return;
+        if (!userPaintingAllowed) return;
+        if (currentActiveScrapTool !== 'draw' && currentActiveScrapTool !== 'erase') return;
+
         const bounds = canvas.getBoundingClientRect();
-        ctx.lineTo(event.clientX - bounds.left, event.clientY - bounds.top);
-        ctx.strokeStyle = document.getElementById('input-scrap-hex').value;
-        ctx.lineWidth = 5;
+        const currentX = event.clientX - bounds.left;
+        const currentY = event.clientY - bounds.top;
+
+        ctx.lineTo(currentX, currentY);
         ctx.stroke();
     };
 
-    window.addEventListener('mouseup', () => userPaintingAllowed = false);
-    refreshScrapbookCanvasLayer(ctx, canvas);
+    window.addEventListener('mouseup', () => { 
+        if (userPaintingAllowed) {
+            userPaintingAllowed = false;
+            // Redraw template grids behind lines to maintain depth clarity
+            refreshMasterScrapbookLayers(ctx, canvas);
+        }
+    });
 }
 
 function changeScrapbookTool(targetMode) {
@@ -227,24 +251,90 @@ function changeScrapbookTool(targetMode) {
     if(matchedBtn) matchedBtn.classList.add('active');
 }
 
-function refreshScrapbookCanvasLayer(ctx, canvas) {
+function updateScrapbookTemplate() {
+    const canvas = document.getElementById('canvasScrap');
+    const templateSelect = document.getElementById('scrap-template-select');
+    if (!canvas || !templateSelect) return;
+    
+    scrapbookActiveTemplate = templateSelect.value;
+    const ctx = canvas.getContext('2d');
+    refreshMasterScrapbookLayers(ctx, canvas);
+}
+
+function drawActiveNotebookTemplate(ctx, canvas) {
+    // Clear back base
+    ctx.fillStyle = '#fafafa';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    ctx.lineWidth = 1;
+    ctx.globalAlpha = 1.0;
+
+    if (scrapbookActiveTemplate === 'lined') {
+        // Render 16-bit cozy school diary lines
+        ctx.strokeStyle = '#d2e2f2';
+        for (let y = 30; y < canvas.height; y += 24) {
+            ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke();
+        }
+        // Left margin accent line
+        ctx.strokeStyle = '#ffccd5';
+        ctx.beginPath(); ctx.moveTo(60, 0); ctx.lineTo(60, canvas.height); ctx.stroke();
+
+    } else if (scrapbookActiveTemplate === 'grid') {
+        // Engineering blueprint graph grid
+        ctx.strokeStyle = '#e6edf2';
+        for (let x = 20; x < canvas.width; x += 20) {
+            ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke();
+        }
+        for (let y = 20; y < canvas.height; y += 20) {
+            ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke();
+        }
+
+    } else if (scrapbookActiveTemplate === 'dots') {
+        // Bullet journal dotted organization layout
+        ctx.fillStyle = '#cbdde6';
+        for (let x = 25; x < canvas.width; x += 25) {
+            for (let y = 25; y < canvas.height; y += 25) {
+                ctx.fillRect(x, y, 2, 2);
+            }
+        }
+    }
+}
+
+function refreshMasterScrapbookLayers(ctx, canvas) {
+    // Note: Freehand ink drawings stay baked directly onto the canvas, 
+    // but templates and objects re-render over top or handle vector depth here.
+    drawActiveNotebookTemplate(ctx, canvas);
+
     boardVectorRegistry.forEach(node => {
-        if(node.type === 'heart') {
+        ctx.globalAlpha = 1.0;
+        if (node.type === 'heart') {
             ctx.fillStyle = node.color;
             ctx.fillRect(node.x, node.y, 20, 20); 
-        } else if(node.type === 'star') {
+        } else if (node.type === 'star') {
             drawPixelSprite(ctx, 'star', node.x, node.y, 4);
+        } else if (node.type === 'tape') {
+            // Semi-translucent Washi tape look
+            ctx.globalAlpha = 0.5;
+            ctx.fillStyle = node.color;
+            ctx.fillRect(node.x, node.y, 50, 16);
+            // Grid jagged edge borders
+            ctx.strokeStyle = '#3c2f31';
+            ctx.lineWidth = 1;
+            ctx.globalAlpha = 0.3;
+            ctx.strokeRect(node.x, node.y, 50, 16);
         }
     });
+    ctx.globalAlpha = 1.0; // Reset state mapping safety
 }
 
 function wipeScrapbookCanvas() {
     const canvas = document.getElementById('canvasScrap');
     if(!canvas) return;
     const ctx = canvas.getContext('2d');
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
     boardVectorRegistry = [];
+    drawActiveNotebookTemplate(ctx, canvas);
 }
+
 
 // ==========================================
 // 3. MODULE: GARDEN TYCOON (ROBLOX PROGRESSION)
