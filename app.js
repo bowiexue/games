@@ -1,361 +1,385 @@
-// ============================================================================
-// SYSTEM FRAMEWORK VIEW ROUTER
-// ============================================================================
-function switchView(viewId, title) {
-    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-    const target = document.getElementById(viewId);
-    if(target) target.classList.add('active');
-    
-    document.getElementById('mainTitle').innerText = title;
-    document.getElementById('backBtn').style.display = 'block';
+// ==========================================
+// PIXEL RENDER CORE MATRICES (NO EMOJIS)
+// ==========================================
+const SPRITES = {
+    shiba: [
+        "  0000  ",
+        " 011110 ",
+        "01211210",
+        "01111110",
+        " 013310 ",
+        "  0000  "
+    ],
+    drink: [
+        " 1111 ",
+        " 2222 ",
+        " 2222 ",
+        " 1111 "
+    ],
+    sprout: [
+        "  11  ",
+        "111111",
+        "  22  ",
+        "  22  "
+    ],
+    berry: [
+        "  11  ",
+        " 3333 ",
+        "333333",
+        " 3333 "
+    ],
+    pet: [
+        " 11  11 ",
+        " 11  11 ",
+        "11111111",
+        "11211211",
+        "11111111",
+        " 111111 "
+    ],
+    star: [
+        "  1  ",
+        " 111 ",
+        "11111",
+        " 111 ",
+        "  1  "
+    ]
+};
 
-    if (viewId === 'cafeView') initTocaCafeSystem();
-    if (viewId === 'scrapbookView') initNotabilitySystem();
-    if (viewId === 'starView') initStarJarSystem();
-}
+const COLOR_MAPS = {
+    shiba: { '0': '#4a3b3d', '1': '#e1b12c', '2': '#ffffff', '3': '#f5cd79' },
+    drink: { '1': '#4a3b3d', '2': '#74b9ff' },
+    sprout: { '1': '#4cd137', '2': '#4a3b3d' },
+    berry: { '1': '#4cd137', '3': '#ff4757' },
+    pet: { '1': '#ffffff', '2': '#000000' },
+    star: { '1': '#ffda79' }
+};
 
-function showHome() {
-    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-    document.getElementById('homeView').classList.add('active');
-    document.getElementById('mainTitle').innerText = 'COZY WORLD OS';
-    document.getElementById('backBtn').style.display = 'none';
-    
-    clearInterval(tocaLoopInterval);
-    clearInterval(starLoopInterval);
-}
+function drawPixelSprite(ctx, spriteKey, x, y, size = 4) {
+    const sprite = SPRITES[spriteKey];
+    const colors = COLOR_MAPS[spriteKey];
+    if(!sprite || !ctx) return;
 
-// ============================================================================
-// 1. TOCA BOCA MOUSE-DRIVEN PATHFINDER CAFE ENGINE
-// ============================================================================
-let cafeCanvas, cafeCtx, tocaLoopInterval;
-let shibaCoord = { x: 150, y: 250, tx: 150, ty: 250, velocity: 8, package: null };
-let ordersTable = [
-    { id: 0, x: 550, y: 150, objective: '🍓 Berry Dango Shake', progress: 'WAITING' },
-    { id: 1, x: 550, y: 380, objective: '🥞 Golden Hotcakes', progress: 'WAITING' }
-];
-let bankCashBalance = 0;
-
-function initTocaCafeSystem() {
-    cafeCanvas = document.getElementById('cafeCanvas');
-    if(!cafeCanvas) return;
-    cafeCtx = cafeCanvas.getContext('2d');
-    
-    cafeCanvas.onclick = function(e) {
-        const bounds = cafeCanvas.getBoundingClientRect();
-        shibaCoord.tx = e.clientX - bounds.left;
-        shibaCoord.ty = e.clientY - bounds.top;
-    };
-    
-    clearInterval(tocaLoopInterval);
-    tocaLoopInterval = setInterval(processTocaEngineFrame, 30);
-}
-
-function processTocaEngineFrame() {
-    let dx = shibaCoord.tx - shibaCoord.x;
-    let dy = shibaCoord.ty - shibaCoord.y;
-    let distance = Math.hypot(dx, dy);
-    
-    if(distance > shibaCoord.velocity) {
-        shibaCoord.x += (dx / distance) * shibaCoord.velocity;
-        shibaCoord.y += (dy / distance) * shibaCoord.velocity;
-    }
-
-    // Kitchen pick up intersection points
-    if (shibaCoord.x < 160 && shibaCoord.y < 180) shibaCoord.package = '🍓 Berry Dango Shake';
-    if (shibaCoord.x < 160 && shibaCoord.y > 350) shibaCoord.package = '🥞 Golden Hotcakes';
-
-    // Order completion logic
-    ordersTable.forEach(tbl => {
-        if(Math.hypot(shibaCoord.x - tbl.x, shibaCoord.y - tbl.y) < 65 && shibaCoord.package === tbl.objective && tbl.progress === 'WAITING') {
-            tbl.progress = 'CHEWING';
-            shibaCoord.package = null;
-            bankCashBalance += 35;
-            document.getElementById('cafeCash').innerText = bankCashBalance;
-            setTimeout(() => { tbl.progress = 'WAITING'; }, 6000);
-        }
-    });
-
-    // Drawing Canvas World Scene Procedurally
-    cafeCtx.fillStyle = '#FFF5F6';
-    cafeCtx.fillRect(0, 0, cafeCanvas.width, cafeCanvas.height);
-
-    // Grid matrix
-    cafeCtx.strokeStyle = 'rgba(255,182,193,0.25)';
-    cafeCtx.lineWidth = 2;
-    for(let w=0; w<cafeCanvas.width; w+=50) {
-        cafeCtx.beginPath(); cafeCtx.moveTo(w,0); cafeCtx.lineTo(w, cafeCanvas.height); cafeCtx.stroke();
-    }
-
-    // Kitchen counter renders
-    cafeCtx.fillStyle = '#FFB6C1';
-    cafeCtx.fillRect(20, 30, 140, 120);
-    cafeCtx.fillRect(20, 380, 140, 120);
-    cafeCtx.fillStyle = '#4A3B3D';
-    cafeCtx.font = 'bold 14px Fredoka';
-    cafeCtx.fillText('🍓 Drink Depot', 35, 95);
-    cafeCtx.fillText('🥞 Pastry Oven', 35, 445);
-
-    // Tables
-    ordersTable.forEach(tbl => {
-        cafeCtx.fillStyle = '#FFE0C2';
-        cafeCtx.beginPath(); cafeCtx.arc(tbl.x, tbl.y, 50, 0, Math.PI*2); cafeCtx.fill();
-        cafeCtx.font = '36px sans-serif';
-        let stateFace = tbl.progress === 'WAITING' ? '🐱' : '🐱✨💖';
-        cafeCtx.fillText(stateFace, tbl.x - 18, tbl.y - 60);
-        
-        if(tbl.progress === 'WAITING') {
-            cafeCtx.fillStyle = '#FF8DA1';
-            cafeCtx.font = '12px Fredoka';
-            cafeCtx.fillText(`WANT: ${tbl.objective.split(' ')}`, tbl.x - 55, tbl.y - 110);
-        }
-    });
-
-    // Main Sprite Node
-    cafeCtx.font = '50px sans-serif';
-    cafeCtx.fillText('🐕', shibaCoord.x - 25, shibaCoord.y + 20);
-    if(shibaCoord.package) {
-        cafeCtx.font = '18px sans-serif';
-        cafeCtx.fillText(shibaCoord.package.split(' '), shibaCoord.x + 15, shibaCoord.y - 35);
-    }
-}
-
-// ============================================================================
-// 2. NOTABILITY DESK NOTEBOOK ENVIRONMENT
-// ============================================================================
-let activeToolMode = 'pen', scrapDrawCtx, pointerDownTrack = false;
-
-function initNotabilitySystem() {
-    const layer = document.getElementById('scrapDrawLayer');
-    if(!layer) return;
-    scrapDrawCtx = layer.getContext('2d');
-    
-    layer.onmousedown = (e) => {
-        if(activeToolMode === 'text') {
-            const block = document.createElement('input');
-            block.className = 'custom-note-element typed-block';
-            block.placeholder = 'Type...';
-            block.style.left = e.offsetX + 'px';
-            block.style.top = e.offsetY + 'px';
-            block.style.color = document.getElementById('scrapColor').value;
-            document.getElementById('notabilitySheet').appendChild(block);
-            return;
-        }
-        if(activeToolMode === 'tape') {
-            const tape = document.createElement('div');
-            tape.className = 'custom-note-element tape-strip';
-            tape.style.left = e.offsetX + 'px';
-            tape.style.top = e.offsetY + 'px';
-            document.getElementById('notabilitySheet').appendChild(tape);
-            return;
-        }
-        if(activeToolMode === 'sticker') {
-            const stickers = ['🌸', '🧸', '🎀', '🍡', '⭐'];
-            const randomSticker = stickers[Math.floor(Math.random() * stickers.length)];
-            const node = document.createElement('div');
-            node.className = 'custom-note-element';
-            node.style.fontSize = '2.5rem';
-            node.innerText = randomSticker;
-            node.style.left = e.offsetX + 'px';
-            node.style.top = e.offsetY + 'px';
-            document.getElementById('notabilitySheet').appendChild(node);
-            return;
-        }
-        pointerDownTrack = true;
-        scrapDrawCtx.beginPath();
-        scrapDrawCtx.moveTo(e.offsetX, e.offsetY);
-    };
-
-    layer.onmousemove = (e) => {
-        if(!pointerDownTrack) return;
-        scrapDrawCtx.lineTo(e.offsetX, e.offsetY);
-        scrapDrawCtx.strokeStyle = document.getElementById('scrapColor').value;
-        scrapDrawCtx.lineWidth = activeToolMode === 'highlighter' ? 20 : 4;
-        scrapDrawCtx.globalAlpha = activeToolMode === 'highlighter' ? 0.35 : 1.0;
-        scrapDrawCtx.stroke();
-    };
-    
-    window.addEventListener('mouseup', () => { pointerDownTrack = false; if(scrapDrawCtx) scrapDrawCtx.globalAlpha = 1.0; });
-}
-
-function setScrapTool(targetMode) {
-    activeToolMode = targetMode;
-    document.querySelectorAll('.os-tool-tab').forEach(t => t.classList.remove('active'));
-    const targetedTab = document.getElementById(`tool-${targetMode}`);
-    if(targetedTab) targetedTab.classList.add('active');
-}
-
-function clearScrapbook() {
-    const layer = document.getElementById('scrapDrawLayer');
-    if(scrapDrawCtx && layer) scrapDrawCtx.clearRect(0,0, layer.width, layer.height);
-    document.querySelectorAll('.custom-note-element').forEach(el => el.remove());
-}
-
-// ============================================================================
-// 3. ROBLOX GARDEN TYCOON AUTO CYCLES
-// ============================================================================
-let tycoonWalletGems = 10, unlockedTycoonPlotsCount = 1;
-let tycoonFieldsArray = [
-    { live: true, completion: 0, scaleBonus: 4 },
-    { live: false, completion: 0, scaleBonus: 9 },
-    { live: false, completion: 0, scaleBonus: 22 }
-];
-let automaticSprinklerDroneActive = false, bioFertilizerMultiplier = 1;
-
-setInterval(() => {
-    if(!document.getElementById('gardeningView').classList.contains('active')) return;
-    
-    tycoonFieldsArray.forEach((field, index) => {
-        if(field.live && field.completion < 100) {
-            let incrementSpeed = automaticSprinklerDroneActive ? 15 : 6;
-            field.completion = Math.min(100, field.completion + (incrementSpeed * bioFertilizerMultiplier));
-            
-            const titleNode = document.getElementById(`tpTitle${index}`);
-            const subtitleNode = document.getElementById(`tpSub${index}`);
-            
-            if(titleNode && subtitleNode) {
-                if(field.completion >= 100) {
-                    titleNode.innerText = `💥 PLOT ${index + 1}: READY TO HARVEST`;
-                    subtitleNode.innerText = `Click card container box to redeem +${field.scaleBonus} Gems!`;
-                } else {
-                    titleNode.innerText = `🌱 PLOT ${index + 1}: INFRASTRUCTURE SPROUTING`;
-                    subtitleNode.innerText = `Auto simulation ticker status: ${field.completion}% completed`;
-                }
+    sprite.forEach((row, rowIndex) => {
+        for(let colIndex = 0; colIndex < row.length; colIndex++) {
+            const char = row[colIndex];
+            if(char !== ' ') {
+                ctx.fillStyle = colors[char] || '#000000';
+                ctx.fillRect(x + (colIndex * size), y + (rowIndex * size), size, size);
             }
         }
     });
-}, 1200);
+}
 
-function interactTycoonPlot(index) {
-    let targetField = tycoonFieldsArray[index];
-    if(targetField && targetField.live && targetField.completion >= 100) {
-        tycoonWalletGems += targetField.scaleBonus;
-        targetField.completion = 0;
-        document.getElementById('tycoonGems').innerText = tycoonWalletGems;
+// ==========================================
+// CORE HUB FRAME CONTROL
+// ==========================================
+let activeLoops = {};
+
+function loadGame(gameKey) {
+    document.querySelectorAll('.game-view').forEach(v => v.classList.remove('active'));
+    killAllLoops();
+
+    if(gameKey === 'cafe') {
+        document.getElementById('view-cafe').classList.add('active');
+        document.getElementById('screen-title').innerText = 'SHIBA CAFE';
+        startCafe();
+    } else if(gameKey === 'scrap') {
+        document.getElementById('view-scrap').classList.add('active');
+        document.getElementById('screen-title').innerText = 'SCRAPBOOK';
+        startScrap();
+    } else if(gameKey === 'tycoon') {
+        document.getElementById('view-tycoon').classList.add('active');
+        document.getElementById('screen-title').innerText = 'GARDEN TYCOON';
+        startTycoon();
+    } else if(gameKey === 'pet') {
+        document.getElementById('view-pet').classList.add('active');
+        document.getElementById('screen-title').innerText = 'PET ADORN';
+        startPet();
+    } else if(gameKey === 'catcher') {
+        document.getElementById('view-catcher').classList.add('active');
+        document.getElementById('screen-title').innerText = 'STAR JAR';
+        startCatcher();
     }
 }
 
-function buyTycoonItem(shopType) {
-    if(shopType === 'plot' && tycoonWalletGems >= 20 && unlockedTycoonPlotsCount < 3) {
-        tycoonWalletGems -= 20;
-        tycoonFieldsArray[unlockedTycoonPlotsCount].live = true;
-        const frame = document.getElementById(`tPlotCard${unlockedTycoonPlotsCount}`);
-        if(frame) frame.classList.remove('locked');
-        unlockedTycoonPlotsCount++;
-    } else if(shopType === 'drone' && tycoonWalletGems >= 45) {
-        tycoonWalletGems -= 45;
-        automaticSprinklerDroneActive = true;
-    } else if(shopType === 'growth' && tycoonWalletGems >= 65) {
-        tycoonWalletGems -= 65;
-        bioFertilizerMultiplier = 2.5;
-    }
-    document.getElementById('tycoonGems').innerText = tycoonWalletGems;
+function goToHome() {
+    document.querySelectorAll('.game-view').forEach(v => v.classList.remove('active'));
+    document.getElementById('view-hub').classList.add('active');
+    document.getElementById('screen-title').innerText = 'PIXEL SYSTEM';
+    killAllLoops();
 }
 
-// ============================================================================
-// 4. TAMAGOTCHI PET SYSTEM ARCHITECTURE
-// ============================================================================
-let hardwareTokensCount = 0, tamagotchiHungerLevel = 100;
-let petEquippedAccessory = 'none';
-
-function hardwareTomaPress(actionKey) {
-    const speech = document.getElementById('tomaSpeech');
-    const hatLayer = document.getElementById('tomaHatNode');
-    
-    if(actionKey === 'feed') {
-        tamagotchiHungerLevel = Math.min(100, tamagotchiHungerLevel + 25);
-        if(speech) speech.innerText = '"Yum! Treats are delicious!"';
-    } else if(actionKey === 'pet') {
-        hardwareTokensCount += 1;
-        tamagotchiHungerLevel = Math.max(0, tamagotchiHungerLevel - 2);
-        if(speech) speech.innerText = '"Bouncing! More tokens spawned!"';
-    } else if(actionKey === 'shop1' && hardwareTokensCount >= 5) {
-        hardwareTokensCount -= 5;
-        petEquippedAccessory = 'crown';
-        if(hatLayer) hatLayer.innerText = '👑';
-    } else if(actionKey === 'shop2' && hardwareTokensCount >= 3) {
-        hardwareTokensCount -= 3;
-        petEquippedAccessory = 'bow';
-        if(hatLayer) hatLayer.innerText = '🎀';
-    }
-    
-    const hungerLabel = document.getElementById('lblHunger');
-    const tokenLabel = document.getElementById('lblTokens');
-    if(hungerLabel) hungerLabel.innerText = tamagotchiHungerLevel;
-    if(tokenLabel) tokenLabel.innerText = hardwareTokensCount;
+function killAllLoops() {
+    clearInterval(activeLoops.cafe);
+    clearInterval(activeLoops.tycoon);
+    clearInterval(activeLoops.pet);
+    clearInterval(activeLoops.catcher);
 }
 
-// ============================================================================
-// 5. STAR CATCHER PHYSICS CONTROLLER
-// ============================================================================
-let starCanvas, starCtx, starLoopInterval, storageStarBankCount = 0;
-let sweepMeshColor = '#FF8DA1', mouseHorizontalPositionX = 250, flyingStarsArray = [];
+// ==========================================
+// 1. GAME: SHIBA CAFE (PATHFINDING RUN)
+// ==========================================
+let cafeCash = 0;
+let dogX = 80, dogY = 150, dogTX = 80, dogTY = 150;
+let hasDrink = false;
 
-function initStarJarSystem() {
-    starCanvas = document.getElementById('starCanvas');
-    if(!starCanvas) return;
-    starCtx = starCanvas.getContext('2d');
-    flyingStarsArray = [];
+function startCafe() {
+    const canvas = document.getElementById('cafeCanvas');
+    const ctx = canvas.getContext('2d');
     
-    starCanvas.onmousemove = (e) => {
-        const bounds = starCanvas.getBoundingClientRect();
-        mouseHorizontalPositionX = e.clientX - bounds.left;
+    canvas.onclick = function(e) {
+        const r = canvas.getBoundingClientRect();
+        dogTX = e.clientX - r.left;
+        dogTY = e.clientY - r.top;
     };
-    
-    clearInterval(starLoopInterval);
-    starLoopInterval = setInterval(renderStarJarTick, 25);
-}
 
-function renderStarJarTick() {
-    if(!starCtx || !starCanvas) return;
-    starCtx.clearRect(0, 0, starCanvas.width, starCanvas.height);
-    
-    // Glass Vault outline renders
-    starCtx.strokeStyle = 'rgba(212,240,240,0.85)';
-    starCtx.lineWidth = 6;
-    starCtx.strokeRect(440, 30, 80, 120);
-    starCtx.fillStyle = 'rgba(255,255,255,0.15)';
-    starCtx.fillRect(440, 30, 80, 120);
-    
-    starCtx.fillStyle = '#FEF08A';
-    starCtx.font = '14px Fredoka';
-    starCtx.fillText('JAR VAULT', 450, 95);
-
-    // Periodical generation tickers
-    if(Math.random() < 0.08) {
-        flyingStarsArray.push({ x: Math.random() * 400 + 20, y: 0, fallingSpeed: Math.random() * 5 + 4 });
-    }
-
-    // Interactive Mesh Net lines
-    starCtx.fillStyle = sweepMeshColor;
-    starCtx.fillRect(mouseHorizontalPositionX - 55, 510, 110, 18);
-    starCtx.strokeStyle = '#4A3B3D';
-    starCtx.lineWidth = 3;
-    starCtx.strokeRect(mouseHorizontalPositionX - 55, 510, 110, 18);
-
-    for(let i = flyingStarsArray.length - 1; i >= 0; i--) {
-        let activeStar = flyingStarsArray[i];
-        activeStar.y += activeStar.fallingSpeed;
-        
-        starCtx.font = '26px sans-serif';
-        starCtx.fillText('⭐', activeStar.x, activeStar.y);
-
-        // Vector intersection verification formulas
-        if(activeStar.y >= 500 && activeStar.y <= 530 && Math.abs(activeStar.x - mouseHorizontalPositionX) < 60) {
-            storageStarBankCount++;
-            document.getElementById('starBank').innerText = storageStarBankCount;
-            flyingStarsArray.splice(i, 1);
-            continue;
+    activeLoops.cafe = setInterval(() => {
+        let dx = dogTX - dogX;
+        let dy = dogTY - dogY;
+        let dist = Math.hypot(dx, dy);
+        if(dist > 5) {
+            dogX += (dx / dist) * 5;
+            dogY += (dy / dist) * 5;
         }
-        if(activeStar.y > starCanvas.height) flyingStarsArray.splice(i, 1);
+
+        if(dogX < 80 && dogY < 100) {
+            hasDrink = true;
+            document.getElementById('cafe-task').innerText = 'Deliver to Table';
+        }
+        if(dogX > 480 && hasDrink) {
+            hasDrink = false;
+            cafeCash += 15;
+            document.getElementById('cafe-cash').innerText = cafeCash;
+            document.getElementById('cafe-task').innerText = 'Fetch Drink';
+        }
+
+        ctx.clearRect(0,0, canvas.width, canvas.height);
+        
+        ctx.fillStyle = '#ffb6c1';
+        ctx.fillRect(0, 0, 80, 100);
+        ctx.fillStyle = '#4a3b3d';
+        ctx.font = '8px monospace';
+        ctx.fillText("DRINKS", 10, 50);
+
+        ctx.fillStyle = '#ffd3b6';
+        ctx.fillRect(500, 120, 80, 100);
+
+        drawPixelSprite(ctx, 'shiba', dogX, dogY, 4);
+        if(hasDrink) {
+            drawPixelSprite(ctx, 'drink', dogX + 12, dogY - 20, 3);
+        }
+    }, 40);
+}
+// ==========================================
+// 2. GAME: SCRAPBOOK (BOARD SUITE)
+// ==========================================
+let scrapTool = 'draw';
+let scrapElements = [];
+
+function startScrap() {
+    const canvas = document.getElementById('scrapCanvas');
+    const ctx = canvas.getContext('2d');
+    let isDrawing = false;
+
+    canvas.onmousedown = function(e) {
+        const r = canvas.getBoundingClientRect();
+        const mx = e.clientX - r.left;
+        const my = e.clientY - r.top;
+
+        if(scrapTool === 'draw') {
+            isDrawing = true;
+            ctx.beginPath();
+            ctx.moveTo(mx, my);
+        } else if(scrapTool === 'sticker1') {
+            scrapElements.push({ type: 'heart', x: mx, y: my, color: document.getElementById('scrap-color').value });
+            renderScrapbook(ctx, canvas);
+        } else if(scrapTool === 'sticker2') {
+            scrapElements.push({ type: 'star', x: mx, y: my });
+            renderScrapbook(ctx, canvas);
+        }
+    };
+
+    canvas.onmousemove = function(e) {
+        if(!isDrawing || scrapTool !== 'draw') return;
+        const r = canvas.getBoundingClientRect();
+        ctx.lineTo(e.clientX - r.left, e.clientY - r.top);
+        ctx.strokeStyle = document.getElementById('scrap-color').value;
+        ctx.lineWidth = 4;
+        ctx.stroke();
+    };
+
+    window.addEventListener('mouseup', () => isDrawing = false);
+    renderScrapbook(ctx, canvas);
+}
+
+function setScrapTool(tool) { scrapTool = tool; }
+
+function renderScrapbook(ctx, canvas) {
+    scrapElements.forEach(el => {
+        if(el.type === 'heart') {
+            ctx.fillStyle = el.color;
+            ctx.fillRect(el.x, el.y, 16, 16);
+        } else if(el.type === 'star') {
+            drawPixelSprite(ctx, 'star', el.x, el.y, 3);
+        }
+    });
+}
+
+function clearScrapbook() {
+    const canvas = document.getElementById('scrapCanvas');
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0,0, canvas.width, canvas.height);
+    scrapElements = [];
+}
+
+// ==========================================
+// 3. GAME: GARDEN TYCOON (GROW FIELD)
+// ==========================================
+let tycoonGems = 10, plotsOwned = 1, autoSprinkler = false;
+let gardenPlot = { stage: 0, timer: 0 };
+
+function startTycoon() {
+    const canvas = document.getElementById('tycoonCanvas');
+    const ctx = canvas.getContext('2d');
+
+    canvas.onclick = function() {
+        if(gardenPlot.stage === 3) {
+            tycoonGems += 10;
+            gardenPlot.stage = 0;
+            gardenPlot.timer = 0;
+            document.getElementById('tycoon-gems').innerText = tycoonGems;
+        } else if(gardenPlot.stage === 0) {
+            gardenPlot.stage = 1;
+        }
+    };
+
+    activeLoops.tycoon = setInterval(() => {
+        if(gardenPlot.stage > 0 && gardenPlot.stage < 3) {
+            gardenPlot.timer += autoSprinkler ? 2 : 1;
+            if(gardenPlot.timer > 60) {
+                gardenPlot.stage++;
+                gardenPlot.timer = 0;
+            }
+        }
+
+        ctx.clearRect(0,0, canvas.width, canvas.height);
+        
+        ctx.fillStyle = '#573b25';
+        ctx.fillRect(100, 100, 160, 160);
+
+        if(gardenPlot.stage === 1 || gardenPlot.stage === 2) {
+            drawPixelSprite(ctx, 'sprout', 160, 150, 6);
+        } else if(gardenPlot.stage === 3) {
+            drawPixelSprite(ctx, 'berry', 160, 140, 6);
+        }
+    }, 100);
+}
+
+function buyTycoonUpgrade(item) {
+    if(item === 'plot' && tycoonGems >= 20) {
+        tycoonGems -= 20;
+        plotsOwned++;
+    } else if(item === 'water' && tycoonGems >= 40) {
+        tycoonGems -= 40;
+        autoSprinkler = true;
+    }
+    document.getElementById('tycoon-gems').innerText = tycoonGems;
+}
+
+// ==========================================
+// 4. GAME: VIRTUAL PET DEVICE
+// ==========================================
+let petTokens = 0, petHunger = 100, activeHat = false, activeBow = false;
+
+function startPet() {
+    const canvas = document.getElementById('petCanvas');
+    const ctx = canvas.getContext('2d');
+
+    activeLoops.pet = setInterval(() => {
+        petHunger = Math.max(0, petHunger - 1);
+        document.getElementById('pet-hunger').innerText = petHunger;
+
+        ctx.clearRect(0,0, canvas.width, canvas.height);
+        
+        ctx.fillStyle = '#c7ecee';
+        ctx.fillRect(0,0, canvas.width, canvas.height);
+
+        drawPixelSprite(ctx, 'pet', 150, 100, 6);
+
+        if(activeHat) {
+            ctx.fillStyle = '#ff4757';
+            ctx.fillRect(162, 80, 50, 16);
+        }
+        if(activeBow) {
+            ctx.fillStyle = '#e1b12c';
+            ctx.fillRect(140, 140, 20, 20);
+        }
+    }, 1000);
+}
+
+function handlePetAction(act) {
+    if(act === 'feed') petHunger = Math.min(100, petHunger + 20);
+    if(act === 'pet') {
+        petTokens += 2;
+        document.getElementById('pet-tokens').innerText = petTokens;
     }
 }
 
-function upgradeStarNet(type, cost) {
-    if(storageStarBankCount >= cost) {
-        storageStarBankCount -= cost;
-        if (type === 'sakura') sweepMeshColor = '#FFB6C1';
-        if (type === 'nebula') sweepMeshColor = '#A29BFE';
-        if (type === 'gold') sweepMeshColor = '#FEF08A';
-        document.getElementById('starBank').innerText = storageStarBankCount;
+function buyPetCosmetic(type) {
+    if(type === 'hat' && petTokens >= 5) { petTokens -= 5; activeHat = true; }
+    if(type === 'bow' && petTokens >= 3) { petTokens -= 3; activeBow = true; }
+    document.getElementById('pet-tokens').innerText = petTokens;
+}
+
+// ==========================================
+// 5. GAME: STAR JAR NET SIMULATOR
+// ==========================================
+let starScore = 0, basketX = 160, netColor = '#ff8da1';
+let stars = [];
+
+function startCatcher() {
+    const canvas = document.getElementById('starCanvas');
+    const ctx = canvas.getContext('2d');
+    stars = [];
+
+    canvas.onmousemove = function(e) {
+        const r = canvas.getBoundingClientRect();
+        basketX = e.clientX - r.left;
+    };
+
+    activeLoops.catcher = setInterval(() => {
+        if(Math.random() < 0.06) {
+            stars.push({ x: Math.random() * 320 + 20, y: 0 });
+        }
+
+        ctx.clearRect(0,0, canvas.width, canvas.height);
+
+        ctx.strokeStyle = '#74b9ff';
+        ctx.lineWidth = 4;
+        ctx.strokeRect(360, 40, 60, 100);
+
+        ctx.fillStyle = netColor;
+        ctx.fillRect(basketX - 30, 320, 60, 12);
+
+        for(let i = stars.length - 1; i >= 0; i--) {
+            let s = stars[i];
+            s.y += 4;
+
+            drawPixelSprite(ctx, 'star', s.x, s.y, 3);
+
+            if(s.y >= 315 && s.y <= 335 && Math.abs(s.x - basketX) < 35) {
+                starScore++;
+                document.getElementById('star-score').innerText = starScore;
+                stars.splice(i, 1);
+                continue;
+            }
+            if(s.y > canvas.height) stars.splice(i, 1);
+        }
+    }, 30);
+}
+
+function upgradeNet(colorHex) {
+    if(starScore >= 10) {
+        netColor = colorHex;
     }
 }
