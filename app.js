@@ -46,9 +46,9 @@ const SPRITES = {
 };
 
 const COLOR_MAPS = {
-    shiba: { '0': '#4a3b3d', '1': '#e1b12c', '2': '#ffffff', '3': '#f5cd79' },
-    drink: { '1': '#4a3b3d', '2': '#74b9ff' },
-    sprout: { '1': '#4cd137', '2': '#4a3b3d' },
+    shiba: { '0': '#3c2f31', '1': '#e1b12c', '2': '#ffffff', '3': '#f5cd79' },
+    drink: { '1': '#3c2f31', '2': '#74b9ff' },
+    sprout: { '1': '#4cd137', '2': '#3c2f31' },
     berry: { '1': '#4cd137', '3': '#ff4757' },
     pet: { '1': '#ffffff', '2': '#000000' },
     star: { '1': '#ffda79' }
@@ -71,315 +71,339 @@ function drawPixelSprite(ctx, spriteKey, x, y, size = 4) {
 }
 
 // ==========================================
-// CORE HUB FRAME CONTROL
+// CENTRALIZED VIEW SWITCH CONTROL
 // ==========================================
-let activeLoops = {};
+let activeIntervalLoops = {};
 
-function loadGame(gameKey) {
-    document.querySelectorAll('.game-view').forEach(v => v.classList.remove('active'));
-    killAllLoops();
+function launchAppView(gameKey) {
+    document.querySelectorAll('.app-view').forEach(panel => panel.classList.remove('active'));
+    terminateAllActiveIntervals();
 
     if(gameKey === 'cafe') {
-        document.getElementById('view-cafe').classList.add('active');
-        document.getElementById('screen-title').innerText = 'SHIBA CAFE';
-        startCafe();
+        document.getElementById('panel-cafe').classList.add('active');
+        document.getElementById('app-window-title').innerText = 'SYSTEM: SHIBA_CAFE_TOCA';
+        bootstrapCafeEngine();
     } else if(gameKey === 'scrap') {
-        document.getElementById('view-scrap').classList.add('active');
-        document.getElementById('screen-title').innerText = 'SCRAPBOOK';
-        startScrap();
+        document.getElementById('panel-scrap').classList.add('active');
+        document.getElementById('app-window-title').innerText = 'SYSTEM: SCRAPBOOK_NOTABILITY';
+        bootstrapScrapbookEngine();
     } else if(gameKey === 'tycoon') {
-        document.getElementById('view-tycoon').classList.add('active');
-        document.getElementById('screen-title').innerText = 'GARDEN TYCOON';
-        startTycoon();
+        document.getElementById('panel-tycoon').classList.add('active');
+        document.getElementById('app-window-title').innerText = 'SYSTEM: TYCOON_GARDEN_ROBLOX';
+        bootstrapTycoonEngine();
     } else if(gameKey === 'pet') {
-        document.getElementById('view-pet').classList.add('active');
-        document.getElementById('screen-title').innerText = 'PET ADORN';
-        startPet();
-    } else if(gameKey === 'catcher') {
-        document.getElementById('view-catcher').classList.add('active');
-        document.getElementById('screen-title').innerText = 'STAR JAR';
-        startCatcher();
+        document.getElementById('panel-pet').classList.add('active');
+        document.getElementById('app-window-title').innerText = 'SYSTEM: TAMAGOTCHI_DEVICE';
+        bootstrapPetEngine();
+    } else if(gameKey === 'star') {
+        document.getElementById('panel-star').classList.add('active');
+        document.getElementById('app-window-title').innerText = 'SYSTEM: STAR_JAR_VAULT';
+        bootstrapCatcherEngine();
     }
 }
 
-function goToHome() {
-    document.querySelectorAll('.game-view').forEach(v => v.classList.remove('active'));
-    document.getElementById('view-hub').classList.add('active');
-    document.getElementById('screen-title').innerText = 'PIXEL SYSTEM';
-    killAllLoops();
+function returnToMainMenu() {
+    document.querySelectorAll('.app-view').forEach(panel => panel.classList.remove('active'));
+    document.getElementById('panel-hub').classList.add('active');
+    document.getElementById('app-window-title').innerText = 'SYSTEM: CORE_HUB';
+    terminateAllActiveIntervals();
 }
 
-function killAllLoops() {
-    clearInterval(activeLoops.cafe);
-    clearInterval(activeLoops.tycoon);
-    clearInterval(activeLoops.pet);
-    clearInterval(activeLoops.catcher);
+function terminateAllActiveIntervals() {
+    clearInterval(activeIntervalLoops.cafe);
+    clearInterval(activeIntervalLoops.tycoon);
+    clearInterval(activeIntervalLoops.pet);
+    clearInterval(activeIntervalLoops.catcher);
 }
 
 // ==========================================
-// 1. GAME: SHIBA CAFE (PATHFINDING RUN)
+// 1. MODULE: SHIBA CAFE (TOCA MOUSE WALK PATHS)
 // ==========================================
-let cafeCash = 0;
-let dogX = 80, dogY = 150, dogTX = 80, dogTY = 150;
-let hasDrink = false;
+let globalCafeCash = 0;
+let positionX = 120, positionY = 180, destinationTX = 120, destinationTY = 180;
+let isCarryingDrinkAsset = false;
 
-function startCafe() {
-    const canvas = document.getElementById('cafeCanvas');
+function bootstrapCafeEngine() {
+    const canvas = document.getElementById('canvasCafe');
+    if(!canvas) return;
     const ctx = canvas.getContext('2d');
     
-    canvas.onclick = function(e) {
-        const r = canvas.getBoundingClientRect();
-        dogTX = e.clientX - r.left;
-        dogTY = e.clientY - r.top;
+    canvas.onclick = function(event) {
+        const bounds = canvas.getBoundingClientRect();
+        destinationTX = event.clientX - bounds.left;
+        destinationTY = event.clientY - bounds.top;
     };
 
-    activeLoops.cafe = setInterval(() => {
-        let dx = dogTX - dogX;
-        let dy = dogTY - dogY;
-        let dist = Math.hypot(dx, dy);
-        if(dist > 5) {
-            dogX += (dx / dist) * 5;
-            dogY += (dy / dist) * 5;
-        }
-
-        if(dogX < 80 && dogY < 100) {
-            hasDrink = true;
-            document.getElementById('cafe-task').innerText = 'Deliver to Table';
-        }
-        if(dogX > 480 && hasDrink) {
-            hasDrink = false;
-            cafeCash += 15;
-            document.getElementById('cafe-cash').innerText = cafeCash;
-            document.getElementById('cafe-task').innerText = 'Fetch Drink';
-        }
-
-        ctx.clearRect(0,0, canvas.width, canvas.height);
+    activeIntervalLoops.cafe = setInterval(() => {
+        // Move character dynamically along target vector path
+        let deltaX = destinationTX - positionX;
+        let deltaY = destinationTY - positionY;
+        let distanceRadius = Math.hypot(deltaX, deltaY);
         
-        ctx.fillStyle = '#ffb6c1';
-        ctx.fillRect(0, 0, 80, 100);
-        ctx.fillStyle = '#4a3b3d';
-        ctx.font = '8px monospace';
-        ctx.fillText("DRINKS", 10, 50);
-
-        ctx.fillStyle = '#ffd3b6';
-        ctx.fillRect(500, 120, 80, 100);
-
-        drawPixelSprite(ctx, 'shiba', dogX, dogY, 4);
-        if(hasDrink) {
-            drawPixelSprite(ctx, 'drink', dogX + 12, dogY - 20, 3);
+        if(distanceRadius > 6) {
+            positionX += (deltaX / distanceRadius) * 6;
+            positionY += (deltaY / distanceRadius) * 6;
         }
-    }, 40);
+
+        // Action Station Threshold Collisions
+        if(positionX < 90 && positionY < 120) {
+            isCarryingDrinkAsset = true;
+            document.getElementById('lbl-cafe-prompt').innerText = 'Deliver to Table Desk';
+        }
+        if(positionX > 500 && isCarryingDrinkAsset) {
+            isCarryingDrinkAsset = false;
+            globalCafeCash += 20;
+            document.getElementById('lbl-cafe-cash').innerText = globalCafeCash;
+            document.getElementById('lbl-cafe-prompt').innerText = 'Fetch Drink Station';
+        }
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        // Counter station bar
+        ctx.fillStyle = '#ffcad4';
+        ctx.fillRect(0, 0, 90, 110);
+        ctx.fillStyle = '#3c2f31';
+        ctx.font = '8px monospace';
+        ctx.fillText("BREW BAR", 12, 55);
+
+        // Guest Table base node
+        ctx.fillStyle = '#ffdfca';
+        ctx.fillRect(530, 130, 90, 110);
+
+        // Render Frame Output Sprites
+        drawPixelSprite(ctx, 'shiba', positionX, positionY, 4);
+        if(isCarryingDrinkAsset) {
+            drawPixelSprite(ctx, 'drink', positionX + 10, positionY - 24, 3);
+        }
+    }, 35);
 }
 // ==========================================
-// 2. GAME: SCRAPBOOK (BOARD SUITE)
+// 2. MODULE: SCRAPBOOK NOTEBOOK (NOTABILITY SUITE)
 // ==========================================
-let scrapTool = 'draw';
-let scrapElements = [];
+let currentActiveScrapTool = 'draw';
+let boardVectorRegistry = [];
 
-function startScrap() {
-    const canvas = document.getElementById('scrapCanvas');
+function bootstrapScrapbookEngine() {
+    const canvas = document.getElementById('canvasScrap');
+    if(!canvas) return;
     const ctx = canvas.getContext('2d');
-    let isDrawing = false;
+    let userPaintingAllowed = false;
 
-    canvas.onmousedown = function(e) {
-        const r = canvas.getBoundingClientRect();
-        const mx = e.clientX - r.left;
-        const my = e.clientY - r.top;
+    canvas.onmousedown = function(event) {
+        const bounds = canvas.getBoundingClientRect();
+        const mouseX = event.clientX - bounds.left;
+        const mouseY = event.clientY - bounds.top;
 
-        if(scrapTool === 'draw') {
-            isDrawing = true;
+        if(currentActiveScrapTool === 'draw') {
+            userPaintingAllowed = true;
             ctx.beginPath();
-            ctx.moveTo(mx, my);
-        } else if(scrapTool === 'sticker1') {
-            scrapElements.push({ type: 'heart', x: mx, y: my, color: document.getElementById('scrap-color').value });
-            renderScrapbook(ctx, canvas);
-        } else if(scrapTool === 'sticker2') {
-            scrapElements.push({ type: 'star', x: mx, y: my });
-            renderScrapbook(ctx, canvas);
+            ctx.moveTo(mouseX, mouseY);
+        } else if(currentActiveScrapTool === 'sticker1') {
+            boardVectorRegistry.push({ type: 'heart', x: mouseX, y: mouseY, color: document.getElementById('input-scrap-hex').value });
+            refreshScrapbookCanvasLayer(ctx, canvas);
+        } else if(currentActiveScrapTool === 'sticker2') {
+            boardVectorRegistry.push({ type: 'star', x: mouseX, y: mouseY });
+            refreshScrapbookCanvasLayer(ctx, canvas);
         }
     };
 
-    canvas.onmousemove = function(e) {
-        if(!isDrawing || scrapTool !== 'draw') return;
-        const r = canvas.getBoundingClientRect();
-        ctx.lineTo(e.clientX - r.left, e.clientY - r.top);
-        ctx.strokeStyle = document.getElementById('scrap-color').value;
-        ctx.lineWidth = 4;
+    canvas.onmousemove = function(event) {
+        if(!userPaintingAllowed || currentActiveScrapTool !== 'draw') return;
+        const bounds = canvas.getBoundingClientRect();
+        ctx.lineTo(event.clientX - bounds.left, event.clientY - bounds.top);
+        ctx.strokeStyle = document.getElementById('input-scrap-hex').value;
+        ctx.lineWidth = 5;
         ctx.stroke();
     };
 
-    window.addEventListener('mouseup', () => isDrawing = false);
-    renderScrapbook(ctx, canvas);
+    window.addEventListener('mouseup', () => userPaintingAllowed = false);
+    refreshScrapbookCanvasLayer(ctx, canvas);
 }
 
-function setScrapTool(tool) { scrapTool = tool; }
+function changeScrapbookTool(targetMode) {
+    currentActiveScrapTool = targetMode;
+    document.querySelectorAll('.tool-toggle-btn').forEach(btn => btn.classList.remove('active'));
+    const matchedBtn = document.getElementById(`tool-${targetMode}`);
+    if(matchedBtn) matchedBtn.classList.add('active');
+}
 
-function renderScrapbook(ctx, canvas) {
-    scrapElements.forEach(el => {
-        if(el.type === 'heart') {
-            ctx.fillStyle = el.color;
-            ctx.fillRect(el.x, el.y, 16, 16);
-        } else if(el.type === 'star') {
-            drawPixelSprite(ctx, 'star', el.x, el.y, 3);
+function refreshScrapbookCanvasLayer(ctx, canvas) {
+    boardVectorRegistry.forEach(node => {
+        if(node.type === 'heart') {
+            ctx.fillStyle = node.color;
+            ctx.fillRect(node.x, node.y, 20, 20); 
+        } else if(node.type === 'star') {
+            drawPixelSprite(ctx, 'star', node.x, node.y, 4);
         }
     });
 }
 
-function clearScrapbook() {
-    const canvas = document.getElementById('scrapCanvas');
+function wipeScrapbookCanvas() {
+    const canvas = document.getElementById('canvasScrap');
+    if(!canvas) return;
     const ctx = canvas.getContext('2d');
-    ctx.clearRect(0,0, canvas.width, canvas.height);
-    scrapElements = [];
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    boardVectorRegistry = [];
 }
 
 // ==========================================
-// 3. GAME: GARDEN TYCOON (GROW FIELD)
+// 3. MODULE: GARDEN TYCOON (ROBLOX PROGRESSION)
 // ==========================================
-let tycoonGems = 10, plotsOwned = 1, autoSprinkler = false;
-let gardenPlot = { stage: 0, timer: 0 };
+let globalTycoonGems = 10, plotsUnlockedCounter = 1, autoSprinklerActive = false;
+let singlePlotState = { growthStage: 0, deltaTimer: 0 };
 
-function startTycoon() {
-    const canvas = document.getElementById('tycoonCanvas');
+function bootstrapTycoonEngine() {
+    const canvas = document.getElementById('canvasTycoon');
+    if(!canvas) return;
     const ctx = canvas.getContext('2d');
 
     canvas.onclick = function() {
-        if(gardenPlot.stage === 3) {
-            tycoonGems += 10;
-            gardenPlot.stage = 0;
-            gardenPlot.timer = 0;
-            document.getElementById('tycoon-gems').innerText = tycoonGems;
-        } else if(gardenPlot.stage === 0) {
-            gardenPlot.stage = 1;
+        if(singlePlotState.growthStage === 3) {
+            globalTycoonGems += 12;
+            singlePlotState.growthStage = 0;
+            singlePlotState.deltaTimer = 0;
+            document.getElementById('lbl-tycoon-gems').innerText = globalTycoonGems;
+        } else if(singlePlotState.growthStage === 0) {
+            singlePlotState.growthStage = 1;
         }
     };
 
-    activeLoops.tycoon = setInterval(() => {
-        if(gardenPlot.stage > 0 && gardenPlot.stage < 3) {
-            gardenPlot.timer += autoSprinkler ? 2 : 1;
-            if(gardenPlot.timer > 60) {
-                gardenPlot.stage++;
-                gardenPlot.timer = 0;
+    activeIntervalLoops.tycoon = setInterval(() => {
+        if(singlePlotState.growthStage > 0 && singlePlotState.growthStage < 3) {
+            singlePlotState.deltaTimer += autoSprinklerActive ? 3 : 1;
+            if(singlePlotState.deltaTimer > 50) {
+                singlePlotState.growthStage++;
+                singlePlotState.deltaTimer = 0;
             }
         }
 
-        ctx.clearRect(0,0, canvas.width, canvas.height);
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
         
-        ctx.fillStyle = '#573b25';
-        ctx.fillRect(100, 100, 160, 160);
+        // Brown Soil Pit Block
+        ctx.fillStyle = '#6d4c41';
+        ctx.fillRect(120, 100, 180, 180);
 
-        if(gardenPlot.stage === 1 || gardenPlot.stage === 2) {
-            drawPixelSprite(ctx, 'sprout', 160, 150, 6);
-        } else if(gardenPlot.stage === 3) {
-            drawPixelSprite(ctx, 'berry', 160, 140, 6);
+        if(singlePlotState.growthStage === 1 || singlePlotState.growthStage === 2) {
+            drawPixelSprite(ctx, 'sprout', 190, 160, 7);
+        } else if(singlePlotState.growthStage === 3) {
+            drawPixelSprite(ctx, 'berry', 190, 150, 7);
         }
     }, 100);
 }
 
-function buyTycoonUpgrade(item) {
-    if(item === 'plot' && tycoonGems >= 20) {
-        tycoonGems -= 20;
-        plotsOwned++;
-    } else if(item === 'water' && tycoonGems >= 40) {
-        tycoonGems -= 40;
-        autoSprinkler = true;
+function triggerTycoonPurchase(upgradeKey) {
+    if(upgradeKey === 'plot' && globalTycoonGems >= 20) {
+        globalTycoonGems -= 20;
+        plotsUnlockedCounter++;
+    } else if(upgradeKey === 'sprinkler' && globalTycoonGems >= 40) {
+        globalTycoonGems -= 40;
+        autoSprinklerActive = true;
     }
-    document.getElementById('tycoon-gems').innerText = tycoonGems;
+    document.getElementById('lbl-tycoon-gems').innerText = globalTycoonGems;
 }
 
 // ==========================================
-// 4. GAME: VIRTUAL PET DEVICE
+// 4. MODULE: VIRTUAL PET ADORN DEVICE
 // ==========================================
-let petTokens = 0, petHunger = 100, activeHat = false, activeBow = false;
+let tokenAccountScore = 0, petVitalityHunger = 100, hatBoutiqueAttached = false, bowBoutiqueAttached = false;
 
-function startPet() {
-    const canvas = document.getElementById('petCanvas');
+function bootstrapPetEngine() {
+    const canvas = document.getElementById('canvasPet');
+    if(!canvas) return;
     const ctx = canvas.getContext('2d');
 
-    activeLoops.pet = setInterval(() => {
-        petHunger = Math.max(0, petHunger - 1);
-        document.getElementById('pet-hunger').innerText = petHunger;
+    activeIntervalLoops.pet = setInterval(() => {
+        petVitalityHunger = Math.max(0, petVitalityHunger - 1);
+        document.getElementById('lbl-pet-hunger').innerText = petVitalityHunger;
 
-        ctx.clearRect(0,0, canvas.width, canvas.height);
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
         
-        ctx.fillStyle = '#c7ecee';
-        ctx.fillRect(0,0, canvas.width, canvas.height);
+        // Pastel device casing block walls
+        ctx.fillStyle = '#b5ebd9';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        drawPixelSprite(ctx, 'pet', 150, 100, 6);
+        // Frame target creature vector
+        drawPixelSprite(ctx, 'pet', 160, 100, 6);
 
-        if(activeHat) {
-            ctx.fillStyle = '#ff4757';
-            ctx.fillRect(162, 80, 50, 16);
+        // Dynamic clothing overlays
+        if(hatBoutiqueAttached) {
+            ctx.fillStyle = '#ffd700'; // Gold tier hat
+            ctx.fillRect(174, 82, 54, 14);
         }
-        if(activeBow) {
-            ctx.fillStyle = '#e1b12c';
-            ctx.fillRect(140, 140, 20, 20);
+        if(bowBoutiqueAttached) {
+            ctx.fillStyle = '#ff758f';
+            ctx.fillRect(152, 142, 22, 22);
         }
     }, 1000);
 }
 
-function handlePetAction(act) {
-    if(act === 'feed') petHunger = Math.min(100, petHunger + 20);
-    if(act === 'pet') {
-        petTokens += 2;
-        document.getElementById('pet-tokens').innerText = petTokens;
+function executePetCommand(actionKey) {
+    if(actionKey === 'feed') petVitalityHunger = Math.min(100, petVitalityHunger + 25);
+    if(actionKey === 'pet') {
+        tokenAccountScore += 3;
+        document.getElementById('lbl-pet-tokens').innerText = tokenAccountScore;
     }
 }
 
-function buyPetCosmetic(type) {
-    if(type === 'hat' && petTokens >= 5) { petTokens -= 5; activeHat = true; }
-    if(type === 'bow' && petTokens >= 3) { petTokens -= 3; activeBow = true; }
-    document.getElementById('pet-tokens').innerText = petTokens;
+function executePetBoutiqueBuy(cosmeticKey) {
+    if(cosmeticKey === 'hat' && tokenAccountScore >= 5) { tokenAccountScore -= 5; hatBoutiqueAttached = true; }
+    if(cosmeticKey === 'bow' && tokenAccountScore >= 3) { tokenAccountScore -= 3; bowBoutiqueAttached = true; }
+    document.getElementById('lbl-pet-tokens').innerText = tokenAccountScore;
 }
 
 // ==========================================
-// 5. GAME: STAR JAR NET SIMULATOR
+// 5. MODULE: STAR JAR (FALLING VECTOR COLLIDE)
 // ==========================================
-let starScore = 0, basketX = 160, netColor = '#ff8da1';
-let stars = [];
+let collectedStarScore = 0, sweepNetBasketX = 180, sweepNetColorHex = '#ff758f';
+let stellarObjectArray = [];
 
-function startCatcher() {
-    const canvas = document.getElementById('starCanvas');
+function bootstrapCatcherEngine() {
+    const canvas = document.getElementById('canvasStar');
+    if(!canvas) return;
     const ctx = canvas.getContext('2d');
-    stars = [];
+    stellarObjectArray = [];
 
-    canvas.onmousemove = function(e) {
-        const r = canvas.getBoundingClientRect();
-        basketX = e.clientX - r.left;
+    canvas.onmousemove = function(event) {
+        const bounds = canvas.getBoundingClientRect();
+        sweepNetBasketX = event.clientX - bounds.left;
     };
 
-    activeLoops.catcher = setInterval(() => {
-        if(Math.random() < 0.06) {
-            stars.push({ x: Math.random() * 320 + 20, y: 0 });
+    activeIntervalLoops.catcher = setInterval(() => {
+        if(Math.random() < 0.05) {
+            stellarObjectArray.push({ x: Math.random() * 350 + 20, y: 0 });
         }
 
-        ctx.clearRect(0,0, canvas.width, canvas.height);
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        ctx.strokeStyle = '#74b9ff';
-        ctx.lineWidth = 4;
-        ctx.strokeRect(360, 40, 60, 100);
+        // Draw structural storage Jar box layout boundaries
+        ctx.strokeStyle = '#a29bfe';
+        ctx.lineWidth = 5;
+        ctx.strokeRect(370, 30, 60, 110);
 
-        ctx.fillStyle = netColor;
-        ctx.fillRect(basketX - 30, 320, 60, 12);
+        // Sweep collection tool structure
+        ctx.fillStyle = sweepNetColorHex;
+        ctx.fillRect(sweepNetBasketX - 35, 330, 70, 14);
 
-        for(let i = stars.length - 1; i >= 0; i--) {
-            let s = stars[i];
-            s.y += 4;
+        for(let i = stellarObjectArray.length - 1; i >= 0; i--) {
+            let starNode = stellarObjectArray[i];
+            starNode.y += 5;
 
-            drawPixelSprite(ctx, 'star', s.x, s.y, 3);
+            drawPixelSprite(ctx, 'star', starNode.x, starNode.y, 4);
 
-            if(s.y >= 315 && s.y <= 335 && Math.abs(s.x - basketX) < 35) {
-                starScore++;
-                document.getElementById('star-score').innerText = starScore;
-                stars.splice(i, 1);
+            // Precision collision evaluation bounding hits
+            if(starNode.y >= 320 && starNode.y <= 345 && Math.abs(starNode.x - sweepNetBasketX) < 40) {
+                collectedStarScore++;
+                document.getElementById('lbl-star-score').innerText = collectedStarScore;
+                stellarObjectArray.splice(i, 1);
                 continue;
             }
-            if(s.y > canvas.height) stars.splice(i, 1);
+            if(starNode.y > canvas.height) stellarObjectArray.splice(i, 1);
         }
-    }, 30);
+    }, 25);
 }
 
-function upgradeNet(colorHex) {
-    if(starScore >= 10) {
-        netColor = colorHex;
+function buyNetUpgradeHex(colorHexValue) {
+    if(collectedStarScore >= 10) {
+        sweepNetColorHex = colorHexValue;
     }
 }
