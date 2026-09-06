@@ -52,21 +52,47 @@
         </div>
     </div>
 
-    <!-- 2. SCRAPBOOK PRO VIEW (NOTABILITY NOTEBOOK) -->
+       <!-- 2. SCRAPBOOK PRO VIEW (NOTABILITY NOTEBOOK WITH TEMPLATES) -->
     <div id="panel-scrap" class="app-view">
         <div class="editor-control-strip">
-            <button class="tool-toggle-btn active" id="tool-draw" onclick="changeScrapbookTool('draw')">INK PEN</button>
-            <button class="tool-toggle-btn" id="tool-sticker1" onclick="changeScrapbookTool('sticker1')">+HEART DECAL</button>
-            <button class="tool-toggle-btn" id="tool-sticker2" onclick="changeScrapbookTool('sticker2')">+STAR DECAL</button>
+            <!-- Templates Selector -->
+            <select id="scrap-template-select" onchange="updateScrapbookTemplate()">
+                <option value="blank">📄 Blank Page</option>
+                <option value="lined">📝 Lined Journal</option>
+                <option value="grid">📐 Math Grid</option>
+                <option value="dots">🌸 Polka Dots</option>
+            </select>
+
+            <span class="hud-divider">|</span>
+
+            <!-- Core Drawing & Stamping Tools -->
+            <button class="tool-toggle-btn active" id="tool-draw" onclick="changeScrapbookTool('draw')">PEN</button>
+            <button class="tool-toggle-btn" id="tool-tape" onclick="changeScrapbookTool('tape')">WASHI TAPE</button>
+            <button class="tool-toggle-btn" id="tool-sticker1" onclick="changeScrapbookTool('sticker1')">+HEART</button>
+            <button class="tool-toggle-btn" id="tool-sticker2" onclick="changeScrapbookTool('sticker2')">+STAR</button>
+            <button class="tool-toggle-btn" id="tool-erase" onclick="changeScrapbookTool('erase')">ERASER 🧼</button>
+
+            <span class="hud-divider">|</span>
+
+            <!-- Brush Configuration Options -->
+            <select id="scrap-size-select">
+                <option value="3">Fine (3px)</option>
+                <option value="6" selected>Medium (6px)</option>
+                <option value="12">Thick (12px)</option>
+                <option value="24">Mega (24px)</option>
+            </select>
+
             <div class="color-swatch-container">
                 <input type="color" id="input-scrap-hex" value="#ff4757">
             </div>
-            <button class="retro-btn critical-wipe-btn" onclick="wipeScrapbookCanvas()">WIPE NOTEBOOK</button>
+
+            <button class="retro-btn critical-wipe-btn" onclick="wipeScrapbookCanvas()">CLEAR ALL</button>
         </div>
         <div class="canvas-viewport-wrapper">
             <canvas id="canvasScrap" width="640" height="380"></canvas>
         </div>
     </div>
+
 
     <!-- 3. GARDEN TYCOON VIEW (ROBLOX LOOP PROGRESSION) -->
     <div id="panel-tycoon" class="app-view">
