@@ -1,124 +1,242 @@
+/* SYSTEM INTERFACE RESET */
 * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
     font-family: 'Press Start 2P', monospace;
     image-rendering: pixelated;
+    -webkit-font-smoothing: none;
+    -moz-osx-font-smoothing: none;
 }
 
 body {
-    background-color: #f0e2e6;
+    background-color: #ebd9dd;
     display: flex;
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-    padding: 10px;
+    padding: 15px;
 }
 
-#app-window {
+/* WINDOW DESKTOP WRAPPER SYSTEM */
+#desktop-app-container {
     width: 100%;
-    max-width: 720px;
+    max-width: 760px;
     background: #ffffff;
-    border: 6px solid #4a3b3d;
-    box-shadow: 0 12px 0px #c7b1b5;
+    border: 6px solid #3c2f31;
+    box-shadow: 0 16px 0px #b19da1;
+    border-radius: 4px;
     overflow: hidden;
 }
 
-header {
-    background: #ffb6c1;
-    border-bottom: 6px solid #4a3b3d;
-    padding: 15px;
+.system-bar {
+    background: #ffb3c1;
+    border-bottom: 6px solid #3c2f31;
+    padding: 16px;
     display: flex;
     align-items: center;
-    gap: 15px;
+    gap: 20px;
 }
 
-header h1 {
-    font-size: 1rem;
-    color: #4a3b3d;
+.system-bar h1 {
+    font-size: 0.9rem;
+    color: #3c2f31;
+    letter-spacing: 1px;
 }
 
-button {
+/* UNIVERSAL APP BUTTONS */
+.retro-btn {
     background: #ffffff;
-    border: 3px solid #4a3b3d;
-    padding: 8px 12px;
+    border: 3px solid #3c2f31;
+    padding: 10px 16px;
     font-size: 0.65rem;
     cursor: pointer;
     font-weight: bold;
-    box-shadow: 0 4px 0px #4a3b3d;
+    box-shadow: 0 4px 0px #3c2f31;
+    border-radius: 2px;
 }
 
-button:active {
+.retro-btn:active {
     transform: translateY(4px);
     box-shadow: none;
 }
 
-.game-view {
+.accent-home {
+    background: #ff758f;
+    color: #ffffff;
+    border-color: #3c2f31;
+}
+
+/* VIEW INTERFACE LAYOUT ROUTERS */
+.app-view {
     display: none;
-    padding: 20px;
+    padding: 24px;
     flex-direction: column;
     align-items: center;
     width: 100%;
+    background: #fffbfb;
 }
 
-.game-view.active {
+.app-view.active {
     display: flex;
 }
 
-.menu-grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 15px;
+.hub-header-region {
+    width: 100%;
+    text-align: center;
+    margin-bottom: 24px;
+}
+
+.hub-header-region h2 {
+    font-size: 0.75rem;
+    color: #8a7377;
+    line-height: 1.6;
+}
+
+.portal-grid-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
     width: 100%;
 }
 
-.grid-card {
+.portal-button-card {
     width: 100%;
-    padding: 20px;
-    font-size: 0.8rem;
+    background: #ffffff;
+    border: 4px solid #3c2f31;
+    padding: 24px;
     text-align: left;
+    cursor: pointer;
+    box-shadow: 0 6px 0px #3c2f31;
+    border-radius: 4px;
+    transition: transform 0.1s;
 }
 
-.hud {
-    background: #ffeef2;
-    border: 3px solid #4a3b3d;
-    padding: 8px;
+.portal-button-card:active {
+    transform: translateY(6px);
+    box-shadow: none;
+}
+
+.card-title-text {
+    font-size: 0.75rem;
+    font-weight: bold;
+    color: #3c2f31;
+}
+
+/* TILE STYLE DECORATORS */
+.tile-cafe { background: #ffe3e3; }
+.tile-scrap { background: #e3edf7; }
+.tile-tycoon { background: #e3f7e3; }
+.tile-pet { background: #f7e3f3; }
+.tile-star { background: #fcf7e3; }
+
+/* REUSABLE WORKSPACE COMPONENTS */
+.hud-dashboard-bar {
+    background: #fff0f3;
+    border: 4px solid #3c2f31;
+    padding: 12px;
     font-size: 0.6rem;
     width: 100%;
-    margin-bottom: 12px;
+    margin-bottom: 16px;
     text-align: center;
+    color: #3c2f31;
+    line-height: 1.4;
 }
 
-canvas {
+.hud-divider {
+    margin: 0 10px;
+    color: #b59da1;
+}
+
+.canvas-viewport-wrapper {
     background: #fafafa;
-    border: 4px solid #4a3b3d;
-    max-width: 100%;
+    border: 5px solid #3c2f31;
+    box-shadow: inset 0 0 12px rgba(0,0,0,0.05);
+    line-height: 0;
 }
 
-.toolbar {
+.editor-control-strip {
     display: flex;
     gap: 8px;
-    margin-bottom: 12px;
+    margin-bottom: 16px;
     width: 100%;
     justify-content: center;
     flex-wrap: wrap;
+    align-items: center;
 }
 
-.tycoon-container, .pet-container, .catcher-container {
+.tool-toggle-btn {
+    background: #ffffff;
+    border: 3px solid #3c2f31;
+    padding: 8px 12px;
+    font-size: 0.55rem;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.tool-toggle-btn.active {
+    background: #3c2f31;
+    color: #ffffff;
+}
+
+.color-swatch-container input {
+    border: 3px solid #3c2f31;
+    width: 34px;
+    height: 34px;
+    cursor: pointer;
+    background: transparent;
+}
+
+.critical-wipe-btn {
+    background: #ff4757;
+    color: white;
+}
+
+/* MULTI-PANEL SPLIT WORKSPACE */
+.split-game-workspace {
     display: flex;
-    gap: 15px;
+    gap: 20px;
     width: 100%;
 }
 
-.side-shop {
+.main-canvas-flex {
+    flex-shrink: 0;
+}
+
+.tycoon-shop-dock {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 12px;
     flex: 1;
+    background: #fff0f3;
+    border: 4px solid #3c2f31;
+    padding: 16px;
+    border-radius: 2px;
 }
 
-.side-shop button {
+.dock-title {
+    font-size: 0.6rem;
+    text-align: center;
+    color: #3c2f31;
+    margin-bottom: 6px;
+    border-bottom: 3px dashed #3c2f31;
+    padding-bottom: 8px;
+}
+
+.shop-purchase-btn {
     width: 100%;
-    padding: 12px 6px;
-    font-size: 0.55rem;
+    background: #ffffff;
+    border: 3px solid #3c2f31;
+    padding: 14px 8px;
+    font-size: 0.5rem;
+    cursor: pointer;
+    text-align: left;
+    font-weight: bold;
+    box-shadow: 0 4px 0px #3c2f31;
+    line-height: 1.4;
+}
+
+.shop-purchase-btn:active {
+    transform: translateY(4px);
+    box-shadow: none;
 }
