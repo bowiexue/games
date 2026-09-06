@@ -1,90 +1,90 @@
 :root {
-    --pixel-black: #111111;
-    --pixel-white: #ffffff;
-    --arcade-bg: #2b2b36;
-    --border-grey: #4e4e63;
-    
-    /* Cozy Neon Pastel Palette */
-    --pastel-pink: #ffadad;
-    --pastel-orange: #ffd3b6;
-    --pastel-yellow: #ffeaa7;
-    --pastel-green: #c7ecee;
-    --pastel-blue: #74b9ff;
-    --pastel-purple: #a29bfe;
+    --bg-cozy: #fff5f6;
+    --panel-cozy: #ffeef2;
+    --accent-pink: #ff8da1;
+    --accent-pastel: #ffb6c1;
+    --text-dark: #4a3b3d;
+    --mint-green: #d4f0f0;
 }
 
 * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
-    font-family: 'Press Start 2P', monospace;
-    image-rendering: pixelated;
+    font-family: 'Fredoka', sans-serif;
+    color: var(--text-dark);
 }
 
 body {
-    background-color: #1a1a24;
-    background-image: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
-    background-size: 100% 4px, 6px 100%;
+    background-color: var(--bg-cozy);
+    background-image: radial-gradient(var(--accent-pastel) 12%, transparent 12%);
+    background-size: 24px 24px;
     display: flex;
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-    padding: 10px;
+    padding: 15px;
 }
 
-#arcade-cabinet {
+#cozy-cabinet {
     width: 100%;
-    max-width: 850px;
-    background: var(--arcade-bg);
-    border: 10px solid var(--border-grey);
-    box-shadow: inset 0 0 20px rgba(0,0,0,0.8), 0 16px 0px #0e0e14;
-    border-radius: 8px;
+    max-width: 920px;
+    background: white;
+    border: 8px solid var(--accent-pastel);
+    border-radius: 40px;
+    box-shadow: 0 20px 0px rgba(255, 182, 193, 0.4);
     overflow: hidden;
 }
 
 header {
-    background: #181822;
-    padding: 20px;
+    background: var(--panel-cozy);
+    padding: 24px;
     text-align: center;
-    border-bottom: 6px solid var(--border-grey);
     position: relative;
+    border-bottom: 6px dashed var(--accent-pastel);
 }
 
 h1 {
-    color: var(--pastel-pink);
-    font-size: 1.5rem;
-    text-shadow: 3px 3px 0px #000;
+    font-size: 2rem;
+    font-weight: 600;
+    color: var(--accent-pink);
+    letter-spacing: 1px;
 }
 
-.pixel-btn {
-    background: #38384a;
-    border: 4px solid #000;
-    color: var(--pixel-white);
-    padding: 10px 14px;
-    font-size: 0.75rem;
+.cozy-btn {
+    background: white;
+    border: 3px solid var(--accent-pink);
+    padding: 10px 18px;
+    border-radius: 20px;
+    font-weight: 600;
     cursor: pointer;
-    box-shadow: -4px -4px 0px rgba(0,0,0,0.2) inset, 4px 4px 0px rgba(255,255,255,0.1) inset;
-    text-shadow: 2px 2px 0px #000;
+    box-shadow: 0 4px 0px var(--accent-pink);
+    transition: transform 0.1s, box-shadow 0.1s;
 }
 
-.pixel-btn:active {
-    box-shadow: 2px 2px 0px rgba(0,0,0,0.5) inset;
-    transform: translate(2px, 2px);
+.cozy-btn:active {
+    transform: translateY(4px);
+    box-shadow: none;
 }
 
 .back-btn {
     position: absolute;
-    left: 15px;
+    left: 20px;
     top: 50%;
     transform: translateY(-50%);
-    display: none;
-    background: var(--pastel-purple);
+    background: var(--accent-pink);
+    color: white;
+    border-color: white;
+    box-shadow: 0 4px 0px #ff6b81;
+}
+
+.back-btn:active {
+    transform: translateY(-50%) translateY(4px);
 }
 
 .view {
-    padding: 25px;
+    padding: 30px;
     display: none;
-    min-height: 520px;
 }
 
 .view.active {
@@ -94,42 +94,34 @@ h1 {
 }
 
 .hub-subtitle {
-    color: var(--pastel-orange);
-    font-size: 0.9rem;
-    margin-bottom: 25px;
+    font-size: 1.2rem;
+    font-weight: 400;
+    margin-bottom: 30px;
 }
 
-/* Home Panel Cards Grid */
-.pixel-grid {
+/* Toca Boca Grid Display */
+.cozy-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 20px;
+    gap: 25px;
     width: 100%;
 }
 
-.pixel-card {
-    background: #20202c;
-    border: 6px solid #000;
-    padding: 20px 10px;
+.cozy-card {
+    background: var(--panel-cozy);
+    border: 4px solid transparent;
+    border-radius: 30px;
+    padding: 25px 15px;
     text-align: center;
     cursor: pointer;
-    border-radius: 4px;
+    box-shadow: 0 8px 0px var(--accent-pastel);
+    transition: transform 0.2s;
 }
 
-.pixel-card h3 {
-    font-size: 0.7rem;
-    margin-top: 15px;
-    color: var(--pixel-white);
-}
+.cozy-card:hover { transform: translateY(-5px); border-color: var(--accent-pink); }
+.card-icon { font-size: 3rem; margin-bottom: 10px; }
+.cozy-card h3 { font-size: 0.9rem; font-weight: 600; }
 
-.pixel-icon { font-size: 2.5rem; }
-.card-cafe { border-color: var(--pastel-pink); }
-.card-scrapbook { border-color: var(--pastel-purple); }
-.card-gardening { border-color: var(--pastel-green); }
-.card-pet { border-color: var(--pastel-blue); }
-.card-star { border-color: var(--pastel-yellow); }
-
-/* Game Containers */
 .game-wrapper {
     width: 100%;
     display: flex;
@@ -138,177 +130,100 @@ h1 {
     gap: 15px;
 }
 
-.game-desc {
-    font-size: 0.55rem;
-    color: #a4a4c1;
-    line-height: 1.4;
-    text-align: center;
+.horizontal-layout {
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;
 }
 
 .hud-bar {
-    width: 100%;
-    background: #111116;
-    border: 4px solid var(--border-grey);
-    padding: 10px;
-    display: flex;
-    justify-content: space-around;
-    font-size: 0.75rem;
-    color: var(--pastel-yellow);
+    background: var(--panel-cozy);
+    border-radius: 15px;
+    padding: 8px 20px;
+    font-weight: 600;
+    margin-bottom: 5px;
 }
 
 canvas {
-    border: 6px solid #000;
-    background: #15151c;
-    max-width: 100%;
+    border-radius: 24px;
+    background: #fafafa;
+    border: 4px solid var(--panel-cozy);
+    cursor: crosshair;
 }
 
-/* Cafe D-Pad Controller */
-.dpad {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 5px;
-}
-
-/* Scrapbook Advanced Tools Layout */
+/* Notability Canvas Layout */
 .scrapbook-toolbar {
     display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    background: #181822;
-    padding: 10px;
-    border: 4px solid #000;
+    gap: 12px;
+    background: var(--panel-cozy);
+    padding: 12px;
+    border-radius: 20px;
     width: 100%;
     justify-content: center;
+    align-items: center;
 }
 
-.scrapbook-toolbar input {
-    background: #000;
-    border: 3px solid var(--border-grey);
-    color: #fff;
-    padding: 5px;
-    font-size: 0.65rem;
-}
-
-.canvas-container {
+#notabilityCanvas {
     position: relative;
-    width: 600px;
-    height: 350px;
-    max-width: 100%;
-}
-
-#scrapbookCanvas {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    background: #fbf0db;
-    border: 6px solid #000;
+    width: 650px;
+    height: 380px;
+    background: white;
+    border-radius: 24px;
+    border: 4px dashed var(--accent-pastel);
     overflow: hidden;
 }
 
-#drawingLayer {
+#scrapDrawLayer { position: absolute; top:0; left:0; background:transparent; z-index: 2; }
+
+.notability-text {
     position: absolute;
-    top: 0;
-    left: 0;
+    border: 1px dashed var(--accent-pink);
     background: transparent;
-    border: none;
-    z-index: 1;
-    pointer-events: auto;
-}
-
-.scrapbook-element {
-    position: absolute;
-    cursor: move;
-    font-size: 1rem;
-    user-select: none;
-    z-index: 5;
     padding: 4px;
+    font-size: 1.1rem;
+    outline: none;
+    z-index: 5;
+    cursor: move;
 }
 
-.scrapbook-tape {
-    background: rgba(254, 211, 48, 0.6);
-    border: 2px dashed #e1b12c;
-    width: 70px;
-    height: 20px;
-    transform: rotate(-15deg);
-}
-
-/* Gardening Layout */
-.garden-field {
+/* Roblox Tycoon Style */
+.tycoon-layout { display: flex; width: 100%; gap: 20px; }
+.plots-container { flex: 2; display: flex; flex-direction: column; gap: 15px; }
+.tycoon-plot {
+    background: #e2f5e2;
+    border: 4px solid #b2dbb2;
+    border-radius: 20px;
+    height: 90px;
     display: flex;
-    gap: 25px;
-    margin: 15px 0;
-}
-
-.garden-plot {
-    width: 110px;
-    height: 110px;
-    background: #573b25;
-    border: 6px solid #000;
-    box-shadow: inset -6px -6px 0px #3d2818;
-    display: flex;
-    flex-direction: column;
     align-items: center;
     justify-content: center;
+    font-size: 1.2rem;
+    font-weight: 600;
     cursor: pointer;
+    box-shadow: 0 6px 0px #b2dbb2;
 }
+.upgrade-station { flex: 1; background: var(--panel-cozy); padding: 20px; border-radius: 24px; display: flex; flex-direction: column; gap: 12px; }
 
-.dirt { font-size: 2rem; }
-
-.shop-shelf {
-    background: #181822;
-    padding: 12px;
-    border: 4px solid var(--border-grey);
-    width: 100%;
-    text-align: center;
-}
-
-/* Tamagotchi Screen Layout */
-.pet-screen {
-    width: 320px;
-    height: 200px;
-    background: #84bf94;
-    border: 8px solid #000;
-    box-shadow: inset 4px 4px 0px rgba(0,0,0,0.2);
+/* Tamagotchi Adorn Screen */
+.pet-main-screen { flex: 1.2; background: var(--panel-cozy); padding: 20px; border-radius: 30px; display: flex; flex-direction: column; align-items: center; gap: 15px; }
+.toma-store { flex: 1; background: white; border: 4px solid var(--panel-cozy); padding: 20px; border-radius: 30px; }
+.pet-avatar-frame {
+    width: 140px;
+    height: 140px;
+    background: white;
+    border-radius: 50%;
     display: flex;
-    flex-direction: column;
     align-items: center;
-    justify-content: space-between;
-    padding: 15px;
-}
-
-#petSpeech {
-    font-size: 0.55rem;
-    background: #fff;
-    border: 2px solid #000;
-    padding: 5px;
-    border-radius: 4px;
-    width: 100%;
-    text-align: center;
-}
-
-#pixelPet {
-    font-size: 4.5rem;
-    animation: bounce 0.8s infinite alternate steps(2);
-}
-
-.stats-grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 8px;
-    font-size: 0.65rem;
-    color: #fff;
-    width: 320px;
-}
-
-.pet-actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
     justify-content: center;
+    position: relative;
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.05);
 }
+#tomaPet { font-size: 5rem; }
+#petCosmeticLayer { position: absolute; font-size: 2.5rem; top: -15px; z-index: 10; }
+.bar-bg { width: 100%; background: #eee; height: 16px; border-radius: 10px; overflow: hidden; margin-top: 5px; }
+.bar-fill { background: var(--accent-pink); height: 100%; transition: width 0.3s; }
+.store-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
+.store-item { background: var(--mint-green); border: 2px solid #b2dbb2; border-radius: 15px; padding: 10px; cursor: pointer; font-weight: 600; }
 
-@keyframes bounce {
-    from { transform: translateY(0); }
-    to { transform: translateY(-8px); }
-}
+/* Star Catcher Elements */
+.star-shop { background: var(--panel-cozy); padding: 20px; border-radius: 30px; width: 260px; display: flex; flex-direction: column; gap: 10px; }
