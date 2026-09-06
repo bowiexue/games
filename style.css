@@ -1,10 +1,12 @@
 :root {
-    --bg-cozy: #fff5f6;
-    --panel-cozy: #ffeef2;
-    --accent-pink: #ff8da1;
-    --accent-pastel: #ffb6c1;
-    --text-dark: #4a3b3d;
-    --mint-green: #d4f0f0;
+    --cozy-cream: #fff9fa;
+    --cozy-pink-light: #ffeef2;
+    --cozy-pink-dark: #ff8da1;
+    --cozy-pastel-pink: #ffb6c1;
+    --cozy-slate: #4a3b3d;
+    --cozy-mint: #e2f7f4;
+    --cozy-purple: #e8dbfd;
+    --cozy-yellow: #fff3cd;
 }
 
 * {
@@ -12,117 +14,148 @@
     margin: 0;
     padding: 0;
     font-family: 'Fredoka', sans-serif;
-    color: var(--text-dark);
+    user-select: none;
 }
 
 body {
-    background-color: var(--bg-cozy);
-    background-image: radial-gradient(var(--accent-pastel) 12%, transparent 12%);
-    background-size: 24px 24px;
+    background-color: var(--cozy-cream);
+    background-image: radial-gradient(var(--cozy-pastel-pink) 15%, transparent 15%);
+    background-size: 30px 30px;
     display: flex;
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-    padding: 15px;
+    padding: 20px;
 }
 
-#cozy-cabinet {
+#arcade-cabinet {
     width: 100%;
-    max-width: 920px;
+    max-width: 960px;
     background: white;
-    border: 8px solid var(--accent-pastel);
-    border-radius: 40px;
-    box-shadow: 0 20px 0px rgba(255, 182, 193, 0.4);
+    border: 8px solid var(--cozy-pastel-pink);
+    border-radius: 36px;
+    box-shadow: 0 24px 0px rgba(255, 182, 193, 0.35);
     overflow: hidden;
 }
 
 header {
-    background: var(--panel-cozy);
+    background: var(--cozy-pink-light);
     padding: 24px;
     text-align: center;
     position: relative;
-    border-bottom: 6px dashed var(--accent-pastel);
+}
+
+.pixel-border-bottom {
+    border-bottom: 6px dashed var(--cozy-pastel-pink);
 }
 
 h1 {
-    font-size: 2rem;
-    font-weight: 600;
-    color: var(--accent-pink);
-    letter-spacing: 1px;
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: var(--cozy-pink-dark);
+    text-shadow: 2px 2px 0px white;
 }
 
-.cozy-btn {
+.menu-btn {
     background: white;
-    border: 3px solid var(--accent-pink);
-    padding: 10px 18px;
+    border: 3px solid var(--cozy-pink-dark);
+    padding: 10px 22px;
     border-radius: 20px;
     font-weight: 600;
     cursor: pointer;
-    box-shadow: 0 4px 0px var(--accent-pink);
+    box-shadow: 0 5px 0px var(--cozy-pink-dark);
     transition: transform 0.1s, box-shadow 0.1s;
 }
 
-.cozy-btn:active {
-    transform: translateY(4px);
+.menu-btn:active {
+    transform: translateY(5px);
     box-shadow: none;
 }
 
 .back-btn {
     position: absolute;
-    left: 20px;
+    left: 24px;
     top: 50%;
     transform: translateY(-50%);
-    background: var(--accent-pink);
+    background: var(--cozy-pink-dark);
     color: white;
     border-color: white;
-    box-shadow: 0 4px 0px #ff6b81;
+    box-shadow: 0 5px 0px #ff6b81;
 }
 
-.back-btn:active {
-    transform: translateY(-50%) translateY(4px);
-}
+.back-btn:active { transform: translateY(-50%) translateY(5px); }
 
 .view {
     padding: 30px;
     display: none;
+    min-height: 540px;
 }
 
 .view.active {
     display: flex;
     flex-direction: column;
     align-items: center;
+    width: 100%;
 }
 
 .hub-subtitle {
     font-size: 1.2rem;
-    font-weight: 400;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: var(--cozy-pink-dark);
     margin-bottom: 30px;
 }
 
-/* Toca Boca Grid Display */
-.cozy-grid {
+/* PORTAL CARD SYSTEM GRIDS */
+.portal-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
     gap: 25px;
     width: 100%;
 }
 
-.cozy-card {
-    background: var(--panel-cozy);
+.portal-card {
+    background: var(--cozy-pink-light);
     border: 4px solid transparent;
-    border-radius: 30px;
-    padding: 25px 15px;
+    border-radius: 28px;
+    padding: 30px 15px;
     text-align: center;
     cursor: pointer;
-    box-shadow: 0 8px 0px var(--accent-pastel);
-    transition: transform 0.2s;
+    box-shadow: 0 10px 0px var(--cozy-pastel-pink);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: transform 0.2s, border-color 0.2s;
 }
 
-.cozy-card:hover { transform: translateY(-5px); border-color: var(--accent-pink); }
-.card-icon { font-size: 3rem; margin-bottom: 10px; }
-.cozy-card h3 { font-size: 0.9rem; font-weight: 600; }
+.portal-card:hover {
+    transform: translateY(-6px);
+    border-color: var(--cozy-pink-dark);
+}
 
-.game-wrapper {
+.portal-card h3 {
+    font-size: 0.95rem;
+    font-weight: 700;
+    margin-top: 15px;
+    color: var(--cozy-slate);
+}
+
+/* CSS Procedural Vector Avatars */
+.pixel-avatar {
+    width: 70px;
+    height: 70px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+.shiba-avatar { background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://w3.org" viewBox="0 0 24 24"><path d="M4 4h4v4H4zm12 0h4v4h-4zM6 8h12v12H6zm2 4h2v2H8zm6 0h2v2h-2z" fill="%23e1b12c"/></svg>'); }
+.notebook-avatar { background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://w3.org" viewBox="0 0 24 24"><path d="M4 2h16v20H4zm4 4h8v2H8zm0 4h8v2H8z" fill="%23a29bfe"/></svg>'); }
+.sprout-avatar { background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://w3.org" viewBox="0 0 24 24"><path d="M12 4c-3 0-5 3-5 6h5v10h2V10h5c0-3-2-6-5-6z" fill="%234cd137"/></svg>'); }
+.bun-avatar { background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://w3.org" viewBox="0 0 24 24"><path d="M6 2h4v8H6zm8 0h4v8h-4zM4 10h16v12H4zm4 4h2v2H8zm6 0h2v2h-2z" fill="%23ff7890"/></svg>'); }
+.jar-avatar { background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://w3.org" viewBox="0 0 24 24"><path d="M6 2h12v4H6zm-2 4h16v16H4zm6 4h4v4h-4z" fill="%234cd137"/></svg>'); }
+
+/* FRAMEWORK SCENE STANDARDS */
+.game-container {
     width: 100%;
     display: flex;
     flex-direction: column;
@@ -130,100 +163,245 @@ h1 {
     gap: 15px;
 }
 
-.horizontal-layout {
+.split-view {
     flex-direction: row;
     align-items: flex-start;
     justify-content: space-between;
 }
 
-.hud-bar {
-    background: var(--panel-cozy);
-    border-radius: 15px;
-    padding: 8px 20px;
-    font-weight: 600;
-    margin-bottom: 5px;
+.game-hud {
+    background: var(--cozy-yellow);
+    border: 3px solid #ffda6a;
+    padding: 8px 24px;
+    border-radius: 16px;
+    font-weight: 700;
+    font-size: 1.1rem;
+}
+
+.hint-text {
+    font-size: 0.85rem;
+    color: #887376;
+    text-align: center;
+}
+
+.canvas-wrapper {
+    background: white;
+    border: 5px solid var(--cozy-pink-light);
+    border-radius: 28px;
+    overflow: hidden;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.04);
 }
 
 canvas {
-    border-radius: 24px;
-    background: #fafafa;
-    border: 4px solid var(--panel-cozy);
-    cursor: crosshair;
+    display: block;
 }
 
-/* Notability Canvas Layout */
-.scrapbook-toolbar {
+.pixel-border {
+    border: 4px solid var(--cozy-pastel-pink);
+    border-radius: 24px;
+}
+
+/* NOTABILITY TOOLBAR STYLING */
+.toolbar {
     display: flex;
-    gap: 12px;
-    background: var(--panel-cozy);
+    gap: 10px;
+    background: var(--cozy-pink-light);
     padding: 12px;
-    border-radius: 20px;
     width: 100%;
-    justify-content: center;
     align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
 }
 
-#notabilityCanvas {
-    position: relative;
-    width: 650px;
-    height: 380px;
+.tool-btn {
     background: white;
-    border-radius: 24px;
-    border: 4px dashed var(--accent-pastel);
-    overflow: hidden;
+    border: 2px solid var(--cozy-pink-dark);
+    padding: 8px 14px;
+    border-radius: 14px;
+    font-weight: 600;
+    cursor: pointer;
 }
 
-#scrapDrawLayer { position: absolute; top:0; left:0; background:transparent; z-index: 2; }
+.tool-btn.active {
+    background: var(--cozy-pink-dark);
+    color: white;
+}
 
-.notability-text {
+.color-picker-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+#scrapColor {
+    border: none;
+    width: 35px;
+    height: 35px;
+    cursor: pointer;
+    background: transparent;
+}
+
+#stickerSelect {
+    padding: 6px;
+    border-radius: 10px;
+    border: 2px solid var(--cozy-pastel-pink);
+}
+
+#notabilityWrapper {
+    background: #fafafa;
+    position: relative;
+}
+
+.notability-input-node {
     position: absolute;
-    border: 1px dashed var(--accent-pink);
+    border: 2px dotted var(--cozy-pink-dark);
     background: transparent;
     padding: 4px;
     font-size: 1.1rem;
     outline: none;
-    z-index: 5;
-    cursor: move;
+    z-index: 10;
 }
 
-/* Roblox Tycoon Style */
-.tycoon-layout { display: flex; width: 100%; gap: 20px; }
-.plots-container { flex: 2; display: flex; flex-direction: column; gap: 15px; }
+/* ROBLOX ENGINE PANELS */
+.tycoon-main-panel { flex: 1.8; display: flex; flex-direction: column; gap: 15px; }
+.tycoon-shop-panel { flex: 1; background: var(--cozy-pink-light); padding: 20px; display: flex; flex-direction: column; gap: 12px; }
+
+.plots-field {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    width: 100%;
+}
+
 .tycoon-plot {
-    background: #e2f5e2;
-    border: 4px solid #b2dbb2;
+    background: #f3fbf2;
+    border-color: #bee5bd;
+    padding: 20px;
     border-radius: 20px;
-    height: 90px;
     display: flex;
     align-items: center;
-    justify-content: center;
-    font-size: 1.2rem;
+    gap: 20px;
+    cursor: pointer;
+}
+
+.tycoon-plot.locked {
+    background: #f1ede1;
+    border-color: #dcd4be;
+    opacity: 0.6;
+}
+
+.plot-render {
+    width: 50px;
+    height: 50px;
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+
+.plot-label {
+    font-weight: 700;
+    font-size: 1.1rem;
+}
+
+.shop-buy-btn {
+    background: white;
+    border: 3px solid #b2dbb2;
+    padding: 12px;
+    border-radius: 16px;
+    font-weight: 600;
+    text-align: left;
+    cursor: pointer;
+    box-shadow: 0 4px 0px #b2dbb2;
+}
+
+/* TAMAGOTCHI DASHBOARD PANELS */
+.pet-life-panel { flex: 1.4; background: var(--cozy-pink-light); padding: 20px; display: flex; flex-direction: column; align-items: center; gap: 15px; }
+.pet-boutique-panel { flex: 1; background: white; padding: 20px; display: flex; flex-direction: column; gap: 12px; }
+
+.pet-living-room {
+    width: 100%;
+}
+
+.pet-stats-dashboard {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.stat-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.bar-container {
+    width: 60%;
+    background: #e9ecef;
+    height: 16px;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.bar-fill {
+    height: 100%;
+    width: 100%;
+    transition: width 0.3s ease;
+}
+
+.fill-hunger { background-color: #f6b93b; }
+.fill-love { background-color: var(--cozy-pink-dark); }
+
+.pet-action-triggers {
+    display: flex;
+    gap: 15px;
+    width: 100%;
+}
+
+.action-trigger-btn {
+    flex: 1;
+    padding: 12px;
+    border-radius: 16px;
+    background: white;
+    border: 3px solid var(--cozy-pink-dark);
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.boutique-shelf {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.boutique-item {
+    background: var(--cozy-mint);
+    border: 3px solid #add8e6;
+    padding: 12px;
+    border-radius: 16px;
     font-weight: 600;
     cursor: pointer;
-    box-shadow: 0 6px 0px #b2dbb2;
+    text-align: left;
 }
-.upgrade-station { flex: 1; background: var(--panel-cozy); padding: 20px; border-radius: 24px; display: flex; flex-direction: column; gap: 12px; }
 
-/* Tamagotchi Adorn Screen */
-.pet-main-screen { flex: 1.2; background: var(--panel-cozy); padding: 20px; border-radius: 30px; display: flex; flex-direction: column; align-items: center; gap: 15px; }
-.toma-store { flex: 1; background: white; border: 4px solid var(--panel-cozy); padding: 20px; border-radius: 30px; }
-.pet-avatar-frame {
-    width: 140px;
-    height: 140px;
-    background: white;
-    border-radius: 50%;
+/* STAR VAULT RENDER BLOCKS */
+.star-playfield-area { flex: 1.6; border: 4px solid var(--cozy-pink-light); border-radius: 24px; overflow: hidden; }
+.star-vault-panel { flex: 1; background: var(--cozy-pink-light); padding: 20px; display: flex; flex-direction: column; gap: 15px; }
+
+.vault-market {
     display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-    box-shadow: inset 0 0 10px rgba(0,0,0,0.05);
+    flex-direction: column;
+    gap: 8px;
 }
-#tomaPet { font-size: 5rem; }
-#petCosmeticLayer { position: absolute; font-size: 2.5rem; top: -15px; z-index: 10; }
-.bar-bg { width: 100%; background: #eee; height: 16px; border-radius: 10px; overflow: hidden; margin-top: 5px; }
-.bar-fill { background: var(--accent-pink); height: 100%; transition: width 0.3s; }
-.store-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
-.store-item { background: var(--mint-green); border: 2px solid #b2dbb2; border-radius: 15px; padding: 10px; cursor: pointer; font-weight: 600; }
 
-/* Star Catcher Elements */
-.star-shop { background: var(--panel-cozy); padding: 20px; border-radius: 30px; width: 260px; display: flex; flex-direction: column; gap: 10px; }
+.vault-market-btn {
+    background: white;
+    border: 2px solid var(--cozy-pastel-pink);
+    padding: 12px;
+    border-radius: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    text-align: left;
+}
